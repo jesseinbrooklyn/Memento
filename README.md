@@ -4,7 +4,7 @@
 
 **Memento** is a strict, time-locked iOS/Android application built to enforce brutal stoic discipline. It is not a standard habit tracker; it is a psychological mirror. 
 
-![Memento Mori App Icon](assets/icon.png)
+![Vanitas Mode](assets/splash-icon.png)
 
 ## Core Architecture
 Built structurally on **React Native (Expo)**, **Zustand**, and **SQLite**. Memento operates with absolute zero cloud dependencies. Your statistical death calculations, daily intentions, and personal evening confessions are physically stored locally entirely upon your device's processor.
