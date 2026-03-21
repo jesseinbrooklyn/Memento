@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { usePreferencesStore } from '../../stores/preferences';
@@ -18,6 +20,9 @@ export const TempusScreen: React.FC = () => {
   const isValidDate = parsedBirth != null && !isNaN(parsedBirth.getTime());
   const daysRemaining = isValidDate ? calculateRemainingDays(parsedBirth, lifeFactors) : 14827;
 
+  const metricsAnim = useEntranceAnimation({ delay: 200 });
+  const controlsAnim = useEntranceAnimation({ delay: 400 });
+
   let elapsedPercent = 50;
   if (isValidDate) {
     const totalDays = lifeExpectancy * 365.25;
@@ -35,7 +40,7 @@ export const TempusScreen: React.FC = () => {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           
-          <View style={styles.metricsContainer}>
+          <Animated.View style={[styles.metricsContainer, metricsAnim]}>
             <Text style={styles.mainMetric}>{daysRemaining.toLocaleString()}</Text>
             <Text style={styles.metricLabel}>DAYS REMAINING</Text>
 
@@ -54,9 +59,9 @@ export const TempusScreen: React.FC = () => {
                <OrnateHourglass percentage={elapsedPercent} />
                <Text style={styles.progressText}>{elapsedPercent.toFixed(1)}% OF LIFE ELAPSED</Text>
             </View>
-          </View>
+          </Animated.View>
 
-          <View style={styles.controlsContainer}>
+          <Animated.View style={[styles.controlsContainer, controlsAnim]}>
             <Text style={styles.sectionTitle}>ADJUST ALGORITHM</Text>
             <View style={styles.controlGroup}>
               <Text style={styles.controlLabel}>BIRTHDATE (YYYY/MM/DD)</Text>
@@ -78,7 +83,7 @@ export const TempusScreen: React.FC = () => {
             </View>
 
             <LifestyleSliders />
-          </View>
+          </Animated.View>
 
         </ScrollView>
       </KeyboardAvoidingView>

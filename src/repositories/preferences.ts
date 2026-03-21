@@ -25,6 +25,9 @@ export const PreferencesRepository = {
 
     const { setPreferences, setLifeFactors } = usePreferencesStore.getState();
 
+    if (prefs['hasSeenIntro'] === 'true') {
+      usePreferencesStore.getState().setHasSeenIntro(true);
+    }
     if (prefs['birthDate']) setPreferences({ birthDate: prefs['birthDate'] });
     if (prefs['morningBellTime']) setPreferences({ morningBellTime: prefs['morningBellTime'] });
     if (prefs['eveningBellTime']) setPreferences({ eveningBellTime: prefs['eveningBellTime'] });
@@ -50,5 +53,10 @@ export const PreferencesRepository = {
   async updateBirthDate(date: string): Promise<void> {
     await this.savePreference('birthDate', date);
     usePreferencesStore.getState().setBirthDate(date);
+  },
+
+  async markOnboardingComplete(): Promise<void> {
+    await this.savePreference('hasSeenIntro', 'true');
+    usePreferencesStore.getState().setHasSeenIntro(true);
   }
 };

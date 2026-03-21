@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { usePracticeStore } from '../../stores/practice';
@@ -12,6 +14,9 @@ export const VirtusScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { totalDays, completedDates } = usePracticeStore();
   const { morningBellTime, eveningBellTime } = usePreferencesStore();
+
+  const metricsAnim = useEntranceAnimation({ delay: 200 });
+  const settingsAnim = useEntranceAnimation({ delay: 400 });
 
   const [morning, setMorning] = useState(morningBellTime || '06:30');
   const [evening, setEvening] = useState(eveningBellTime || '20:00');
@@ -43,7 +48,7 @@ export const VirtusScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        <View style={styles.metricsContainer}>
+        <Animated.View style={[styles.metricsContainer, metricsAnim]}>
           <Text style={styles.mainMetric}>{totalDays.toLocaleString()}</Text>
           <Text style={styles.metricLabel}>DAYS OF DISCIPLINE</Text>
 
@@ -55,9 +60,9 @@ export const VirtusScreen: React.FC = () => {
                 ))}
              </View>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.settingsContainer}>
+        <Animated.View style={[styles.settingsContainer, settingsAnim]}>
            <Text style={styles.sectionTitle}>ROUTINE SETTINGS</Text>
            
            <View style={styles.settingRow}>
@@ -86,8 +91,8 @@ export const VirtusScreen: React.FC = () => {
               />
            </View>
 
-           <Text style={styles.settingsFootnote}>Push notifications actively map to these local triggers.</Text>
-        </View>
+           <Text style={styles.settingsFootnote}>Local notifications are scheduled at these times.</Text>
+        </Animated.View>
 
       </ScrollView>
     </SafeAreaView>

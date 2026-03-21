@@ -5,7 +5,7 @@ import { SapientiaStackParamList } from '../../navigation/SapientiaNavigator';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import quotesData from '../../content/quotes.json';
-import { Quote } from '../../components/DailyQuote';
+import { Quote } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, 'QuoteLibrary'>;
 
@@ -68,6 +68,13 @@ export const QuoteLibraryScreen: React.FC<Props> = ({ navigation }) => {
         renderItem={renderQuoteItem}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              {selectedTheme ? `No passages on ${selectedTheme}.` : 'The library is empty.'}
+            </Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );
@@ -150,5 +157,15 @@ const styles = StyleSheet.create({
     color: colors.gold,
     marginTop: spacing.md,
     letterSpacing: 2,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: spacing.xxxl,
+  },
+  emptyText: {
+    fontFamily: 'CormorantGaramond-Italic',
+    fontSize: 18,
+    color: colors.boneDim,
+    textAlign: 'center',
   },
 });

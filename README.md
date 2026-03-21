@@ -16,8 +16,8 @@ The application enforces a rigid daily rhythm perfectly synchronized with your p
 
 ## The Pillars
 1. **Tempus (Time):** A brutally precise algorithm calculating your statistical remaining days on Earth based on your physical life factors (smoking, drinking, exercise, sleep, and diet).
-2. **Sapientia (Wisdom):** A built-in repository of over 50 classical stoic quotes extracted from the writings of Seneca, Marcus Aurelius, and Epictetus. Save your favorites to your localized, dark-mode Commonplace Book.
-3. **Virtus (Discipline):** A strictly authenticated 30-day chronological dot-grid dashboard tracking your exact streaks of completed daily practice. A discipline dot is only organically earned if *both* the Morning and Evening sequences are fulfilled.
+2. **Sapientia (Wisdom):** A built-in repository of 100 classical stoic quotes from Marcus Aurelius, Seneca, Epictetus, Musonius Rufus, Montaigne, and Viktor Frankl. Save your favorites to your localized, dark-mode Commonplace Book.
+3. **Virtus (Discipline):** A strictly authenticated 30-day chronological dot-grid dashboard tracking your exact streaks of completed daily practice. A discipline dot is only organically earned if *both* the Morning and Evening sequences are fulfilled. Begin the ritual in the morning to ensure your day registers on Virtus — the evening reflection alone will not earn the mark.
 
 ## Development Setup
 
@@ -35,5 +35,5 @@ npx expo start
 
 ## V1 Pre-Release Notes
 
-- [ ] Replace `assets/vanitas_bg.png` with a high-res version (current is 640x640, need 2000x2000 minimum for retina displays)
-- [ ] Revise Sapientia tab (quote library UI/UX pass)
+- [x] Replace `assets/vanitas_bg.png` with a high-res version (upgraded to 1848x1848)
+- [x] Revise Sapientia tab (quote library with theme filtering, enriched empty states)

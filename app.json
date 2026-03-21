@@ -5,20 +5,25 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#14100a"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.jesse.memento"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.jesse.memento",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": []
+      }
     },
     "android": {
       "package": "com.jesse.memento",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#000000",
+        "backgroundColor": "#14100a",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -30,7 +35,14 @@
     },
     "plugins": [
       "expo-font",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#c4a35a"
+        }
+      ]
     ]
   }
 }

@@ -4,7 +4,7 @@ import { SapientiaHome } from '../screens/sapientia/SapientiaHome';
 import { QuoteLibraryScreen } from '../screens/sapientia/QuoteLibraryScreen';
 import { QuoteDetailScreen } from '../screens/sapientia/QuoteDetailScreen';
 import { CommonplaceBookScreen } from '../screens/sapientia/CommonplaceBookScreen';
-import { Quote } from '../components/DailyQuote';
+import { Quote } from '../types';
 
 export type SapientiaStackParamList = {
   SapientiaHome: undefined;

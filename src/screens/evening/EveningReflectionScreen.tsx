@@ -7,6 +7,7 @@ import { fonts } from '../../theme/fonts';
 import { MementoButton } from '../../components/MementoButton';
 import { PracticeRepository } from '../../repositories/practice';
 import { getTodaysGratitudePrompt } from '../../utils/dailyContent';
+import * as Haptics from 'expo-haptics';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'EveningReflection'>;
 
@@ -38,6 +39,7 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
       setIsSaving(true);
       try {
         await PracticeRepository.markEveningComplete(responses);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         navigation.reset({ index: 0, routes: [{ name: 'Tabs' }] });
       } catch (e) {
         // Silently capture local db issues

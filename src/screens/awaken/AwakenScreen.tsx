@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, letterSpacing } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
@@ -18,8 +20,12 @@ export const AwakenScreen = () => {
   const [timeStr, setTimeStr] = useState('');
   
   const { morningComplete, eveningComplete, intention } = usePracticeStore(state => state);
-  const isEvening = true; // new Date().getHours() >= 17; // Temporarily unlocked for testing
+  const isEvening = new Date().getHours() >= 17;
   
+  const headerAnim = useEntranceAnimation({ delay: 200 });
+  const centerAnim = useEntranceAnimation({ delay: 350 });
+  const footerAnim = useEntranceAnimation({ delay: 500 });
+
   const { birthDate, lifeFactors } = usePreferencesStore(state => state);
   // Example default if no birthdate is set (e.g. exactly 14,827 days as in mockup)
   const daysRemaining = birthDate 
@@ -42,21 +48,21 @@ export const AwakenScreen = () => {
       
       <View style={[styles.content, { paddingTop: insets.top, paddingBottom: Math.max(insets.bottom, spacing.xxl) }]}>
         
-        <View style={styles.header}>
+        <Animated.View style={[styles.header, headerAnim]}>
           <Text style={styles.title}>MEMENTO MORI</Text>
           <Text style={[styles.clockText, { marginTop: spacing.xxl }, morningComplete && { fontSize: 56 }]}>
             {timeStr}
           </Text>
-        </View>
+        </Animated.View>
 
-        <View style={[styles.centerStage, { flex: 1, justifyContent: 'flex-end', paddingBottom: spacing.xl }]}>
+        <Animated.View style={[styles.centerStage, { flex: 1, justifyContent: 'flex-end', paddingBottom: spacing.xl }, centerAnim]}>
           <Text style={styles.daysText}>{daysRemaining.toLocaleString()} days remaining</Text>
           {morningComplete && intention && (
             <Text style={styles.intentionText}>"{intention}"</Text>
           )}
-        </View>
+        </Animated.View>
 
-        <View style={styles.footer}>
+        <Animated.View style={[styles.footer, footerAnim]}>
           {!morningComplete ? (
             <MementoButton 
               label="I AM AWAKE" 
@@ -70,7 +76,7 @@ export const AwakenScreen = () => {
                />
             ) : null
           )}
-        </View>
+        </Animated.View>
 
       </View>
     </View>

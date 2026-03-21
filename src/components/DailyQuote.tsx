@@ -2,17 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, spacing, letterSpacing } from '../theme/tokens';
 import { fonts } from '../theme/fonts';
+import { Quote } from '../types';
 
-export interface Quote {
-  id: string;
-  text: string;
-  author: string;
-  source: string;
-  authorDates: string;
-  context: string;
-  themes: string[];
-  discipline: 'desire' | 'action' | 'assent';
-}
+export type { Quote };
 
 interface DailyQuoteProps {
   quote: Quote;

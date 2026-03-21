@@ -1,14 +1,7 @@
 import { create } from 'zustand';
+import { JournalEntry } from '../types';
 
-export interface JournalEntry {
-  id: string;
-  date: string;
-  mode: 'freeform' | 'morning' | 'evening_reflection' | 'prompt';
-  content: string;
-  prompt_key: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type { JournalEntry };
 
 interface JournalState {
   entries: JournalEntry[];

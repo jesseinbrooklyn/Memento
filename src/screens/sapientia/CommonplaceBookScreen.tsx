@@ -6,7 +6,7 @@ import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens
 import { fonts } from '../../theme/fonts';
 import { useQuotesStore, SavedQuoteRecord } from '../../stores/quotes';
 import quotesData from '../../content/quotes.json';
-import { Quote } from '../../components/DailyQuote';
+import { Quote } from '../../types';
 import { QuoteRepository } from '../../repositories/quotes';
 
 type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, 'CommonplaceBook'>;
@@ -85,7 +85,10 @@ export const CommonplaceBookScreen: React.FC<Props> = ({ navigation }) => {
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No passages saved yet.</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Your commonplace book is empty.</Text>
+              <Text style={styles.emptyCta}>Save wisdom that strikes you.</Text>
+            </View>
           }
         />
       </KeyboardAvoidingView>
@@ -184,11 +187,21 @@ const styles = StyleSheet.create({
     color: colors.gold,
     letterSpacing: 2,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: spacing.xxxl,
+  },
   emptyText: {
     fontFamily: 'CormorantGaramond-Italic',
     fontSize: 18,
     color: colors.boneDim,
     textAlign: 'center',
-    marginTop: spacing.xxxl,
+  },
+  emptyCta: {
+    fontFamily: fonts.display,
+    fontSize: 14,
+    color: colors.gold,
+    letterSpacing: letterSpacing.wide,
+    marginTop: spacing.md,
   },
 });

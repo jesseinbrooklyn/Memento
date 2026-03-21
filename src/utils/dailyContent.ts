@@ -1,5 +1,5 @@
 import quotesData from '../content/quotes.json';
-import { Quote } from '../components/DailyQuote';
+import { Quote } from '../types';
 
 export function getDailyIndex(poolSize: number): number {
   const now = new Date();
@@ -31,7 +31,19 @@ const GRATITUDE_PROMPTS = [
   "What would today have been like without the silence to think?",
   "What would today have been like without the knowledge that it will end?",
   "What would today have been like without the weight you carry for others?",
-  "What would today have been like without your ability to walk away?"
+  "What would today have been like without your ability to walk away?",
+  "What would today have been like without the roof that sheltered you last night?",
+  "What would today have been like without the stranger who showed you unexpected kindness?",
+  "What would today have been like without the discipline you have built, however imperfect?",
+  "What would today have been like without the child who looks to you for guidance?",
+  "What would today have been like without the difficult truth someone told you?",
+  "What would today have been like without your hands and what they can still make?",
+  "What would today have been like without the morning itself, which many did not see?",
+  "What would today have been like without the capacity to forgive, even if you have not used it?",
+  "What would today have been like without the teacher whose words still echo in your mind?",
+  "What would today have been like without the season that is changing around you?",
+  "What would today have been like without the hunger that drives you to become better?",
+  "What would today have been like without the breath you just drew without thinking?"
 ];
 
 export function getTodaysGratitudePrompt(): string {

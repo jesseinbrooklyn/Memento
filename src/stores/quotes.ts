@@ -1,11 +1,7 @@
 import { create } from 'zustand';
+import { SavedQuoteRecord } from '../types';
 
-export interface SavedQuoteRecord {
-  id: string;
-  quote_id: string;
-  personal_note: string | null;
-  saved_at: string;
-}
+export type { SavedQuoteRecord };
 
 interface QuotesState {
   savedQuotes: SavedQuoteRecord[];

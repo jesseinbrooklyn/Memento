@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Platform, View, Text } from 'react-native';
+import { Platform, View } from 'react-native';
 import {
   useFonts,
   Cinzel_400Regular,
@@ -27,7 +27,7 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { colors } from './src/theme/tokens';
 
 export default function App() {
-  const [dbStatus, setDbStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [dbStatus, setDbStatus] = useState<'loading' | 'ready'>('loading');
 
   const [fontsLoaded] = useFonts({
     'Cinzel': Cinzel_400Regular,
@@ -62,8 +62,7 @@ export default function App() {
          }
       })
       .then(() => setDbStatus('ready'))
-      .catch((e: unknown) => {
-        console.warn('DB init failed, continuing without persistence:', e);
+      .catch(() => {
         setDbStatus('ready');
       });
   }, []);
@@ -71,14 +70,6 @@ export default function App() {
   if (!fontsLoaded || dbStatus === 'loading') {
     return (
       <View style={{ flex: 1, backgroundColor: colors.bgPrimary, justifyContent: 'center', alignItems: 'center' }}>
-      </View>
-    );
-  }
-
-  if (dbStatus === 'error') {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.bgPrimary, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: colors.ember }}>Failed to initialize database.</Text>
       </View>
     );
   }

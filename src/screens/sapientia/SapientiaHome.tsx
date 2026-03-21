@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SapientiaStackParamList } from '../../navigation/SapientiaNavigator';
 import { colors, spacing, letterSpacing } from '../../theme/tokens';
@@ -10,6 +12,7 @@ import { MementoButton } from '../../components/MementoButton';
 import { useQuotesStore } from '../../stores/quotes';
 import { QuoteRepository } from '../../repositories/quotes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 
 type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, 'SapientiaHome'>;
 
@@ -23,6 +26,10 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
   const savedQuotes = useQuotesStore(state => state.savedQuotes);
   const [isSaving, setIsSaving] = useState(false);
 
+  const headerAnim = useEntranceAnimation({ delay: 200 });
+  const quoteAnim = useEntranceAnimation({ delay: 350 });
+  const actionsAnim = useEntranceAnimation({ delay: 500 });
+
   const existingSave = savedQuotes.find(q => q.quote_id === todaysQuote.id);
   const isSaved = !!existingSave;
 
@@ -30,6 +37,7 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
     if (isSaving) return;
     setIsSaving(true);
     try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       if (isSaved) {
         await QuoteRepository.removeQuote(existingSave.id);
       } else {
@@ -42,23 +50,25 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      <Animated.View style={[styles.header, { paddingTop: insets.top }, headerAnim]}>
         <Text style={styles.headerTitle}>SAPIENTIA</Text>
         <TouchableOpacity onPress={() => navigation.navigate('CommonplaceBook')}>
           <Text style={styles.headerBook}>LIBER</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <DailyQuote quote={todaysQuote} showContext={true} />
+        <Animated.View style={quoteAnim}>
+          <DailyQuote quote={todaysQuote} showContext={true} />
 
-        <View style={styles.themeTags}>
-          {todaysQuote.themes.map(t => (
-            <Text key={t} style={styles.tagLabel}>#{t.toUpperCase()}</Text>
-          ))}
-        </View>
+          <View style={styles.themeTags}>
+            {todaysQuote.themes.map(t => (
+              <Text key={t} style={styles.tagLabel}>#{t.toUpperCase()}</Text>
+            ))}
+          </View>
+        </Animated.View>
 
-        <View style={styles.actions}>
+        <Animated.View style={[styles.actions, actionsAnim]}>
           <TouchableOpacity onPress={toggleSave} disabled={isSaving}>
             <Text style={[styles.saveAction, isSaved && styles.savedAction]}>
               {isSaved ? '[ SAVED ]' : '[ SAVE ]'}
@@ -69,7 +79,7 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
             label="VIEW MORE"
             onPress={() => navigation.navigate('QuoteLibrary')}
           />
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

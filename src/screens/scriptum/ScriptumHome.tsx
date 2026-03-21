@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScriptumStackParamList } from '../../navigation/ScriptumNavigator';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
@@ -16,6 +18,9 @@ interface Props {
 export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const entries = useJournalStore(state => state.entries);
+  const headerAnim = useEntranceAnimation({ delay: 200 });
+  const actionsAnim = useEntranceAnimation({ delay: 350 });
+  const listAnim = useEntranceAnimation({ delay: 500 });
 
   const renderItem = ({ item }: { item: JournalEntry }) => {
     const isEvening = item.mode === 'evening_reflection';
@@ -44,11 +49,11 @@ export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      <Animated.View style={[styles.header, { paddingTop: insets.top }, headerAnim]}>
         <Text style={styles.headerTitle}>SCRIPTUM</Text>
-      </View>
+      </Animated.View>
 
-      <View style={styles.actionsRow}>
+      <Animated.View style={[styles.actionsRow, actionsAnim]}>
         <TouchableOpacity 
           style={styles.actionBtn}
           onPress={() => navigation.navigate('JournalEditor', { isPromptMode: false })}
@@ -61,16 +66,23 @@ export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
         >
           <Text style={[styles.actionBtnText, styles.actionBtnTextDark]}>+ STOIC PROMPT</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
+      <Animated.View style={[{ flex: 1 }, listAnim]}>
       <FlatList
         data={entries}
         keyExtractor={e => e.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
-        ListEmptyComponent={<Text style={styles.emptyText}>The ledger is completely blank.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nothing written yet.</Text>
+            <Text style={styles.emptyCta}>Begin.</Text>
+          </View>
+        }
         showsVerticalScrollIndicator={false}
       />
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -161,11 +173,21 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     opacity: 0.9,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: spacing.xxxl,
+  },
   emptyText: {
     fontFamily: 'CormorantGaramond-Italic',
     fontSize: 18,
     color: colors.boneDim,
     textAlign: 'center',
-    marginTop: spacing.xxxl,
+  },
+  emptyCta: {
+    fontFamily: fonts.display,
+    fontSize: 14,
+    color: colors.gold,
+    letterSpacing: letterSpacing.wide,
+    marginTop: spacing.md,
   },
 });

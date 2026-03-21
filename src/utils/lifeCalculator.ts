@@ -1,10 +1,6 @@
-export interface LifeFactors {
-  smoking: 'none' | 'former' | 'light' | 'heavy';
-  drinking: 'none' | 'moderate' | 'heavy' | 'very_heavy';
-  exercise: 'daily' | 'regular' | 'occasional' | 'none';
-  diet: 'excellent' | 'good' | 'average' | 'poor';
-  sleep: 'optimal' | 'good' | 'fair' | 'poor';
-}
+import { LifeFactors } from '../types';
+
+export type { LifeFactors };
 
 // CDC NCHS Data Brief 548 (2024): US male life expectancy
 const BASE_LIFE_EXPECTANCY = 76.5;
