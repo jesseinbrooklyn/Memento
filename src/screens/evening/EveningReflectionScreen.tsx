@@ -58,6 +58,9 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
           value={responses[currentKey as keyof typeof responses]}
           onChangeText={(text) => setResponses({ ...responses, [currentKey]: text })}
           multiline
+          blurOnSubmit
+          returnKeyType={step < 3 ? "next" : "done"}
+          onSubmitEditing={handleNext}
           autoFocus
         />
       </KeyboardAvoidingView>

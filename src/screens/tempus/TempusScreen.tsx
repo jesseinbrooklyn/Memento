@@ -13,11 +13,13 @@ export const TempusScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { birthDate, lifeFactors } = usePreferencesStore();
   
-  const daysRemaining = birthDate ? calculateRemainingDays(new Date(birthDate), lifeFactors) : 14827;
   const lifeExpectancy = calculateLifeExpectancy(lifeFactors);
-  
+  const parsedBirth = birthDate != null && birthDate.length === 10 ? new Date(birthDate.replace(/\//g, '-')) : null;
+  const isValidDate = parsedBirth != null && !isNaN(parsedBirth.getTime());
+  const daysRemaining = isValidDate ? calculateRemainingDays(parsedBirth, lifeFactors) : 14827;
+
   let elapsedPercent = 50;
-  if (birthDate) {
+  if (isValidDate) {
     const totalDays = lifeExpectancy * 365.25;
     elapsedPercent = ((totalDays - daysRemaining) / totalDays) * 100;
   }
@@ -65,7 +67,9 @@ export const TempusScreen: React.FC = () => {
                    let cleaned = t.replace(/[^\d]/g, '');
                    if (cleaned.length > 4) cleaned = cleaned.slice(0, 4) + '/' + cleaned.slice(4);
                    if (cleaned.length > 7) cleaned = cleaned.slice(0, 7) + '/' + cleaned.slice(7);
-                   PreferencesRepository.updateBirthDate(cleaned.slice(0, 10));
+                   const formatted = cleaned.slice(0, 10);
+                   usePreferencesStore.getState().setBirthDate(formatted);
+                   PreferencesRepository.updateBirthDate(formatted);
                 }}
                 placeholder="1990/01/01"
                 placeholderTextColor={colors.boneGhost}

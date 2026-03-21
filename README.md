@@ -32,3 +32,8 @@ npx expo start
 ```
 
 *Note: Push notifications are wired directly into the physical `expo-notifications` matrix and will gracefully fallback if executed within a standard web browser.*
+
+## V1 Pre-Release Notes
+
+- [ ] Replace `assets/vanitas_bg.png` with a high-res version (current is 640x640, need 2000x2000 minimum for retina displays)
+- [ ] Revise Sapientia tab (quote library UI/UX pass)

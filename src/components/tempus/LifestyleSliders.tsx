@@ -53,7 +53,10 @@ export const LifestyleSliders: React.FC = () => {
               <TouchableOpacity
                 key={opt.value}
                 style={[styles.segmentBtn, isActive && styles.segmentBtnActive]}
-                onPress={() => PreferencesRepository.updateLifeFactor(factor, opt.value)}
+                onPress={() => {
+                  usePreferencesStore.getState().setLifeFactors({ [factor]: opt.value });
+                  PreferencesRepository.updateLifeFactor(factor, opt.value);
+                }}
               >
                 <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>{opt.label}</Text>
               </TouchableOpacity>

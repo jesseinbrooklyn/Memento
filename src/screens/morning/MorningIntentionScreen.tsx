@@ -40,6 +40,9 @@ export const MorningIntentionScreen: React.FC<Props> = ({ navigation }) => {
           value={intention}
           onChangeText={setIntention}
           multiline
+          blurOnSubmit
+          returnKeyType="done"
+          onSubmitEditing={handleComplete}
           autoFocus
           maxLength={140}
         />
