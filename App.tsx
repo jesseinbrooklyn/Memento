@@ -19,7 +19,6 @@ import {
 import { initDb } from './src/repositories/db';
 import { PracticeRepository } from './src/repositories/practice';
 import { QuoteRepository } from './src/repositories/quotes';
-import { IntroOverlay } from './src/components/IntroOverlay';
 import { PreferencesRepository } from './src/repositories/preferences';
 import { JournalRepository } from './src/repositories/journal';
 import { usePreferencesStore } from './src/stores/preferences';
@@ -88,7 +87,6 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer>
         <RootNavigator />
-        <IntroOverlay />
       </NavigationContainer>
     </SafeAreaProvider>
   );
