@@ -13,10 +13,18 @@ import { LifestyleSliders } from '../../components/tempus/LifestyleSliders';
 
 export const TempusScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const { birthDate, lifeFactors } = usePreferencesStore();
+  const { birthDate, lifeFactors, use24HourTime } = usePreferencesStore();
   
   const lifeExpectancy = calculateLifeExpectancy(lifeFactors);
-  const parsedBirth = birthDate != null && birthDate.length === 10 ? new Date(birthDate.replace(/\//g, '-')) : null;
+  const parsedBirth = (() => {
+    if (birthDate == null || birthDate.length !== 10) return null;
+    const parts = birthDate.split('/');
+    if (parts.length === 3) {
+      const [mm, dd, yyyy] = parts;
+      return new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
+    }
+    return null;
+  })();
   const isValidDate = parsedBirth != null && !isNaN(parsedBirth.getTime());
   const daysRemaining = isValidDate ? calculateRemainingDays(parsedBirth, lifeFactors) : 14827;
 
@@ -64,25 +72,43 @@ export const TempusScreen: React.FC = () => {
           <Animated.View style={[styles.controlsContainer, controlsAnim]}>
             <Text style={styles.sectionTitle}>ADJUST ALGORITHM</Text>
             <View style={styles.controlGroup}>
-              <Text style={styles.controlLabel}>BIRTHDATE (YYYY/MM/DD)</Text>
+              <Text style={styles.controlLabel}>BIRTHDATE (MM/DD/YYYY)</Text>
               <TextInput
                 style={[styles.dateInput, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
                 value={birthDate || ''}
                 onChangeText={t => {
                    let cleaned = t.replace(/[^\d]/g, '');
-                   if (cleaned.length > 4) cleaned = cleaned.slice(0, 4) + '/' + cleaned.slice(4);
-                   if (cleaned.length > 7) cleaned = cleaned.slice(0, 7) + '/' + cleaned.slice(7);
+                   if (cleaned.length > 2) cleaned = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+                   if (cleaned.length > 5) cleaned = cleaned.slice(0, 5) + '/' + cleaned.slice(5);
                    const formatted = cleaned.slice(0, 10);
                    usePreferencesStore.getState().setBirthDate(formatted);
                    PreferencesRepository.updateBirthDate(formatted);
                 }}
-                placeholder="1990/01/01"
+                placeholder="01/01/1990"
                 placeholderTextColor={colors.boneGhost}
                 keyboardType="number-pad"
               />
             </View>
 
             <LifestyleSliders />
+
+            <View style={styles.controlGroup}>
+              <Text style={styles.controlLabel}>TIME FORMAT</Text>
+              <View style={styles.timeFormatRow}>
+                <TouchableOpacity
+                  style={[styles.timeFormatBtn, !use24HourTime && styles.timeFormatBtnActive]}
+                  onPress={() => PreferencesRepository.updateUse24HourTime(false)}
+                >
+                  <Text style={[styles.timeFormatText, !use24HourTime && styles.timeFormatTextActive]}>12 HR</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.timeFormatBtn, use24HourTime && styles.timeFormatBtnActive]}
+                  onPress={() => PreferencesRepository.updateUse24HourTime(true)}
+                >
+                  <Text style={[styles.timeFormatText, use24HourTime && styles.timeFormatTextActive]}>24 HR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </Animated.View>
 
         </ScrollView>
@@ -193,5 +219,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: spacing.md,
     textAlign: 'center',
-  }
+  },
+  timeFormatRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.bgSecondary,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.goldGlow,
+    overflow: 'hidden',
+  },
+  timeFormatBtn: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  timeFormatBtnActive: {
+    backgroundColor: colors.goldDim,
+  },
+  timeFormatText: {
+    fontFamily: fonts.display,
+    fontSize: 10,
+    color: colors.boneDim,
+    letterSpacing: 1,
+  },
+  timeFormatTextActive: {
+    color: colors.bgPrimary,
+  },
 });

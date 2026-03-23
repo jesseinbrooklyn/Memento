@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, Platform, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
@@ -19,6 +19,7 @@ interface Props {
 export default function OnboardingScreen({ navigation }: Props) {
   const [step, setStep] = useState(0);
   const [birthInput, setBirthInput] = useState('');
+  const { use24HourTime } = usePreferencesStore();
 
   const handleComplete = async () => {
     if (birthInput.length === 10) {
@@ -31,8 +32,8 @@ export default function OnboardingScreen({ navigation }: Props) {
 
   const formatBirthInput = (t: string) => {
     let cleaned = t.replace(/[^\d]/g, '');
-    if (cleaned.length > 4) cleaned = cleaned.slice(0, 4) + '/' + cleaned.slice(4);
-    if (cleaned.length > 7) cleaned = cleaned.slice(0, 7) + '/' + cleaned.slice(7);
+    if (cleaned.length > 2) cleaned = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+    if (cleaned.length > 5) cleaned = cleaned.slice(0, 5) + '/' + cleaned.slice(5);
     setBirthInput(cleaned.slice(0, 10));
   };
 
@@ -69,12 +70,12 @@ export default function OnboardingScreen({ navigation }: Props) {
           </Text>
 
           <View style={styles.controlGroup}>
-            <Text style={styles.controlLabel}>BIRTHDATE (YYYY/MM/DD)</Text>
+            <Text style={styles.controlLabel}>BIRTHDATE (MM/DD/YYYY)</Text>
             <TextInput
               style={[styles.dateInput, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
               value={birthInput}
               onChangeText={formatBirthInput}
-              placeholder="1990/01/01"
+              placeholder="01/01/1990"
               placeholderTextColor={colors.boneGhost}
               keyboardType="number-pad"
             />
@@ -82,6 +83,24 @@ export default function OnboardingScreen({ navigation }: Props) {
           </View>
 
           <LifestyleSliders />
+
+          <View style={styles.controlGroup}>
+            <Text style={styles.controlLabel}>TIME FORMAT</Text>
+            <View style={styles.timeFormatRow}>
+              <TouchableOpacity
+                style={[styles.timeFormatBtn, !use24HourTime && styles.timeFormatBtnActive]}
+                onPress={() => PreferencesRepository.updateUse24HourTime(false)}
+              >
+                <Text style={[styles.timeFormatText, !use24HourTime && styles.timeFormatTextActive]}>12 HR</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.timeFormatBtn, use24HourTime && styles.timeFormatBtnActive]}
+                onPress={() => PreferencesRepository.updateUse24HourTime(true)}
+              >
+                <Text style={[styles.timeFormatText, use24HourTime && styles.timeFormatTextActive]}>24 HR</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </ScrollView>
 
         <View style={styles.footer}>
@@ -174,6 +193,31 @@ const styles = StyleSheet.create({
     color: colors.boneGhost,
     textAlign: 'center',
     marginTop: spacing.sm,
+  },
+  timeFormatRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.bgSecondary,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.goldGlow,
+    overflow: 'hidden',
+  },
+  timeFormatBtn: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  timeFormatBtnActive: {
+    backgroundColor: colors.goldDim,
+  },
+  timeFormatText: {
+    fontFamily: fonts.display,
+    fontSize: 10,
+    color: colors.boneDim,
+    letterSpacing: 1,
+  },
+  timeFormatTextActive: {
+    color: colors.bgPrimary,
   },
   footer: {
     paddingBottom: spacing.xxl,

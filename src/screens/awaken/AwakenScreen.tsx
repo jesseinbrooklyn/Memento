@@ -26,21 +26,26 @@ export const AwakenScreen = () => {
   const centerAnim = useEntranceAnimation({ delay: 350 });
   const footerAnim = useEntranceAnimation({ delay: 500 });
 
-  const { birthDate, lifeFactors } = usePreferencesStore(state => state);
-  // Example default if no birthdate is set (e.g. exactly 14,827 days as in mockup)
-  const daysRemaining = birthDate 
-    ? calculateRemainingDays(new Date(birthDate), lifeFactors)
-    : 14827; 
+  const { birthDate, lifeFactors, use24HourTime } = usePreferencesStore(state => state);
+  const daysRemaining = (() => {
+    if (!birthDate || birthDate.length !== 10) return 14827;
+    const parts = birthDate.split('/');
+    if (parts.length !== 3) return 14827;
+    const [mm, dd, yyyy] = parts;
+    const parsed = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
+    if (isNaN(parsed.getTime())) return 14827;
+    return calculateRemainingDays(parsed, lifeFactors);
+  })();
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setTimeStr(now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }));
+      setTimeStr(now.toLocaleTimeString('en-US', { hour12: !use24HourTime, hour: '2-digit', minute: '2-digit' }));
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [use24HourTime]);
 
   return (
     <View style={styles.container}>

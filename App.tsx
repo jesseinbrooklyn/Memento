@@ -76,7 +76,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={{ dark: true, colors: { primary: colors.gold, background: colors.bgPrimary, card: colors.bgSecondary, text: colors.bone, border: colors.goldDim, notification: colors.gold }, fonts: { regular: { fontFamily: 'System', fontWeight: '400' }, medium: { fontFamily: 'System', fontWeight: '500' }, bold: { fontFamily: 'System', fontWeight: '700' }, heavy: { fontFamily: 'System', fontWeight: '900' } } }}>
         <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>

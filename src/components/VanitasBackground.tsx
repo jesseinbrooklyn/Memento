@@ -66,8 +66,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   painting: {
-    width: '105%',
+    width: '100%',
     height: '105%',
+    marginTop: '5%',
     opacity: 0.45,
   },
   grain: {
