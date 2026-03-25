@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView, TextInput, Text, Platform, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
@@ -40,7 +40,14 @@ function pickRandom(arr: string[], count: number): string[] {
 export const MorningIntentionScreen: React.FC<Props> = ({ navigation }) => {
   const [intention, setIntention] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const suggestions = useMemo(() => pickRandom(INTENTION_SUGGESTIONS, 3), []);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardWillShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardVisible(false));
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
 
   const handleComplete = async () => {
     if (!intention.trim() || isSaving) return;
@@ -71,13 +78,15 @@ export const MorningIntentionScreen: React.FC<Props> = ({ navigation }) => {
             onSubmitEditing={handleComplete}
             maxLength={140}
           />
-          <View style={styles.suggestions}>
-            {suggestions.map((s, i) => (
-              <TouchableOpacity key={i} style={styles.chip} onPress={() => setIntention(s)}>
-                <Text style={styles.chipText}>{s}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {!keyboardVisible && (
+            <View style={styles.suggestions}>
+              {suggestions.map((s, i) => (
+                <TouchableOpacity key={i} style={styles.chip} onPress={() => setIntention(s)}>
+                  <Text style={styles.chipText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </TouchableOpacity>
         <View style={styles.footer}>
           <MementoButton label="BEGIN DAY" onPress={handleComplete} />
