@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, TextInput, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TextInput, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors, spacing, letterSpacing } from '../../theme/tokens';
@@ -50,25 +50,26 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.content}>
-        <Text style={styles.step}>{(step + 1)} / 4</Text>
-        <Text style={styles.prompt}>{currentPrompt}</Text>
-        <TextInput
-          style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
-          placeholder="Reflect..."
-          placeholderTextColor="rgba(212,197,160,0.25)"
-          value={responses[currentKey as keyof typeof responses]}
-          onChangeText={(text) => setResponses({ ...responses, [currentKey]: text })}
-          multiline
-          blurOnSubmit
-          returnKeyType={step < 3 ? "next" : "done"}
-          onSubmitEditing={handleNext}
-          autoFocus
-        />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <TouchableOpacity activeOpacity={1} onPress={Keyboard.dismiss} style={styles.content}>
+          <Text style={styles.step}>{(step + 1)} / 4</Text>
+          <Text style={styles.prompt}>{currentPrompt}</Text>
+          <TextInput
+            style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
+            placeholder="Reflect..."
+            placeholderTextColor="rgba(212,197,160,0.25)"
+            value={responses[currentKey as keyof typeof responses]}
+            onChangeText={(text) => setResponses({ ...responses, [currentKey]: text })}
+            multiline
+            blurOnSubmit
+            returnKeyType={step < 3 ? "next" : "done"}
+            onSubmitEditing={handleNext}
+          />
+        </TouchableOpacity>
+        <View style={styles.footer}>
+          <MementoButton label={step < 3 ? "NEXT" : "DONE"} onPress={handleNext} />
+        </View>
       </KeyboardAvoidingView>
-      <View style={styles.footer}>
-        <MementoButton label={step < 3 ? "NEXT" : "DONE"} onPress={handleNext} />
-      </View>
     </SafeAreaView>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, StyleSheet, SafeAreaView, TextInput, Text, Platform, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TextInput, Text, Platform, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
@@ -56,32 +56,33 @@ export const MorningIntentionScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.prompt}>What is your intention for today?</Text>
-        <TextInput
-          style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
-          placeholder="I will..."
-          placeholderTextColor="rgba(212,197,160,0.25)"
-          value={intention}
-          onChangeText={setIntention}
-          multiline
-          blurOnSubmit
-          returnKeyType="done"
-          onSubmitEditing={handleComplete}
-          autoFocus
-          maxLength={140}
-        />
-        <View style={styles.suggestions}>
-          {suggestions.map((s, i) => (
-            <TouchableOpacity key={i} style={styles.chip} onPress={() => setIntention(s)}>
-              <Text style={styles.chipText}>{s}</Text>
-            </TouchableOpacity>
-          ))}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <TouchableOpacity activeOpacity={1} onPress={Keyboard.dismiss} style={styles.content}>
+          <Text style={styles.prompt}>What is your intention for today?</Text>
+          <TextInput
+            style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
+            placeholder="I will..."
+            placeholderTextColor="rgba(212,197,160,0.25)"
+            value={intention}
+            onChangeText={setIntention}
+            multiline
+            blurOnSubmit
+            returnKeyType="done"
+            onSubmitEditing={handleComplete}
+            maxLength={140}
+          />
+          <View style={styles.suggestions}>
+            {suggestions.map((s, i) => (
+              <TouchableOpacity key={i} style={styles.chip} onPress={() => setIntention(s)}>
+                <Text style={styles.chipText}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+        <View style={styles.footer}>
+          <MementoButton label="BEGIN DAY" onPress={handleComplete} />
         </View>
-      </View>
-      <View style={styles.footer}>
-        <MementoButton label="BEGIN DAY" onPress={handleComplete} />
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
