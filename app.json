@@ -16,7 +16,8 @@
       "bundleIdentifier": "com.jesse.memento",
       "buildNumber": "1",
       "infoPlist": {
-        "UIBackgroundModes": []
+        "UIBackgroundModes": [],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -43,6 +44,11 @@
           "color": "#c4a35a"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b3d567f8-4109-436e-86e7-4b1cff72b95d"
+      }
+    }
   }
 }
