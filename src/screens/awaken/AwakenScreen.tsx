@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, AppState, Platform } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { MementoButton } from '../../components/MementoButton';
 import { calculateRemainingDays } from '../../utils/lifeCalculator';
 import { usePreferencesStore } from '../../stores/preferences';
 import { usePracticeStore } from '../../stores/practice';
+import { PracticeRepository } from '../../repositories/practice';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
@@ -20,7 +21,7 @@ export const AwakenScreen = () => {
   const [timeStr, setTimeStr] = useState('');
   
   const { morningComplete, eveningComplete, intention } = usePracticeStore(state => state);
-  const isEvening = new Date().getHours() >= 17;
+  const [isEvening, setIsEvening] = useState(new Date().getHours() >= 17);
   
   const headerAnim = useEntranceAnimation({ delay: 200 });
   const centerAnim = useEntranceAnimation({ delay: 350 });
@@ -41,11 +42,23 @@ export const AwakenScreen = () => {
     const updateTime = () => {
       const now = new Date();
       setTimeStr(now.toLocaleTimeString('en-US', { hour12: !use24HourTime, hour: '2-digit', minute: '2-digit' }));
+      setIsEvening(now.getHours() >= 17);
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
   }, [use24HourTime]);
+
+  // Reload today's practice state when app returns to foreground (handles day rollover)
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        PracticeRepository.loadTodaysProgress();
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   return (
     <View style={styles.container}>
