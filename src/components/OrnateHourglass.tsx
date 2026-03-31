@@ -1,94 +1,135 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import Svg, { Path, Rect, Defs, LinearGradient, Stop, ClipPath, Line } from 'react-native-svg';
-import Animated, { useSharedValue, withRepeat, withTiming, Easing, useAnimatedProps } from 'react-native-reanimated';
-
-const AnimatedLine = Animated.createAnimatedComponent(Line);
+import { View, Image, StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  withDelay,
+  withSequence,
+  Easing,
+  useReducedMotion,
+} from 'react-native-reanimated';
 import { colors } from '../theme/tokens';
 
 interface OrnateHourglassProps {
   percentage?: number;
 }
 
-export const OrnateHourglass: React.FC<OrnateHourglassProps> = ({ percentage = 50 }) => {
-  const dashOffset = useSharedValue(0);
+const PARTICLE_COUNT = 6;
+const HOURGLASS_HEIGHT = 220;
+const HOURGLASS_WIDTH = 140;
+
+// Each particle falls from the neck area to the bottom bulb
+// Staggered start times, slightly different horizontal drift
+const PARTICLE_CONFIGS = [
+  { delay: 0, driftX: -1.5, duration: 1800, size: 2 },
+  { delay: 300, driftX: 0.8, duration: 1600, size: 1.5 },
+  { delay: 600, driftX: -0.5, duration: 2000, size: 2.5 },
+  { delay: 900, driftX: 1.2, duration: 1700, size: 1.5 },
+  { delay: 1200, driftX: -0.8, duration: 1900, size: 2 },
+  { delay: 1500, driftX: 0.3, duration: 1500, size: 2 },
+];
+
+interface SandParticleProps {
+  config: typeof PARTICLE_CONFIGS[0];
+  active: boolean;
+}
+
+const SandParticle: React.FC<SandParticleProps> = ({ config, active }) => {
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(0);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (percentage < 100) {
-      dashOffset.value = withRepeat(
-        withTiming(-8, { duration: 400, easing: Easing.linear }),
-        -1, 
-        false
-      );
-    }
-  }, [percentage]);
+    if (!active || prefersReducedMotion) return;
 
-  const animatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: dashOffset.value
+    // Fall distance: from neck (~48% down) to bottom bulb (~82% down)
+    const fallStart = 0;
+    const fallEnd = HOURGLASS_HEIGHT * 0.34;
+
+    translateY.value = withDelay(
+      config.delay,
+      withRepeat(
+        withSequence(
+          withTiming(fallStart, { duration: 0 }),
+          withTiming(fallEnd, { duration: config.duration, easing: Easing.in(Easing.quad) }),
+        ),
+        -1,
+        false
+      )
+    );
+
+    opacity.value = withDelay(
+      config.delay,
+      withRepeat(
+        withSequence(
+          withTiming(0.7, { duration: 100 }),
+          withTiming(0.7, { duration: config.duration - 300 }),
+          withTiming(0, { duration: 200 }),
+        ),
+        -1,
+        false
+      )
+    );
+  }, [active, prefersReducedMotion]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: translateY.value },
+      { translateX: config.driftX },
+    ],
+    opacity: opacity.value,
   }));
 
+  if (!active || prefersReducedMotion) return null;
+
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', width: 140, height: 220 }}>
-      {/* 
-        This is a purely SVG-based drawing for the mockup's Reliquary Hourglass. 
-        It uses MEMENTO's tokens for coloring.
-      */}
-      <Svg width="140" height="220" viewBox="0 0 140 220">
-        <Defs>
-          <LinearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor="#ab8c42" />
-            <Stop offset="50%" stopColor={colors.gold} />
-            <Stop offset="100%" stopColor="#8d712f" />
-          </LinearGradient>
-          <ClipPath id="topSandClip">
-            <Rect x="0" y={33 + 77 * (percentage / 100)} width="140" height="77" />
-          </ClipPath>
-          <ClipPath id="bottomSandClip">
-            <Rect x="0" y={187 - 77 * (percentage / 100)} width="140" height="77" />
-          </ClipPath>
-        </Defs>
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          // Start at the neck of the hourglass
+          top: HOURGLASS_HEIGHT * 0.48,
+          left: HOURGLASS_WIDTH / 2 - config.size / 2,
+          width: config.size,
+          height: config.size,
+          borderRadius: config.size / 2,
+          backgroundColor: '#b8973e',
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+};
 
-        {/* Top/Bottom Cap Rings */}
-        <Rect x="30" y="10" width="80" height="15" rx="4" fill="url(#gold)" />
-        <Rect x="20" y="25" width="100" height="8" rx="2" fill="url(#gold)" />
+export const OrnateHourglass: React.FC<OrnateHourglassProps> = ({ percentage = 50 }) => {
+  const isFlowing = percentage < 100;
 
-        <Rect x="30" y="195" width="80" height="15" rx="4" fill="url(#gold)" />
-        <Rect x="20" y="187" width="100" height="8" rx="2" fill="url(#gold)" />
-        
-        {/* Intricate Pillars (Reliquary Style) */}
-        <Rect x="34" y="33" width="6" height="154" fill="url(#gold)" />
-        <Rect x="100" y="33" width="6" height="154" fill="url(#gold)" />
-
-        {/* Gothic Arches Top & Bottom */}
-        <Path d="M40 33 Q 70 80, 100 33 Z" fill="none" stroke="url(#gold)" strokeWidth="3" />
-        <Path d="M40 187 Q 70 140, 100 187 Z" fill="none" stroke="url(#gold)" strokeWidth="3" />
-
-        {/* Jewels on Pillars */}
-        <Rect x="33" y="106" width="8" height="8" rx="4" fill={colors.ember} />
-        <Rect x="99" y="106" width="8" height="8" rx="4" fill={colors.ember} />
-        
-        <Path d="M46 33 Q 46 90, 70 110 Q 94 90, 94 33 Z" fill="rgba(255,255,255,0.03)" stroke={colors.goldDim} strokeWidth="1" />
-        <Path d="M70 110 Q 46 130, 46 187 L 94 187 Q 94 130, 70 110 Z" fill="rgba(255,255,255,0.03)" stroke={colors.goldDim} strokeWidth="1" />
-        
-        {/* Sand */}
-        <Path d="M52 70 Q 60 95, 70 110 Q 80 95, 88 70 Z" fill={colors.gold} opacity="0.85" clipPath="url(#topSandClip)" />
-        <Path d="M70 110 Q 62 145, 52 187 L 88 187 Q 78 145, 70 110 Z" fill={colors.gold} opacity="0.85" clipPath="url(#bottomSandClip)" />
-        
-        {/* Falling Sand Stream */}
-        {percentage < 100 && (
-          <AnimatedLine
-            x1="70"
-            y1="108"
-            x2="70"
-            y2="187"
-            stroke={colors.gold}
-            strokeWidth="1.5"
-            strokeDasharray="4, 4"
-            animatedProps={animatedProps}
-            opacity="0.85"
-          />
-        )}
-      </Svg>
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require('../../assets/newhour.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
+      {/* Sand particles overlay */}
+      {PARTICLE_CONFIGS.map((config, i) => (
+        <SandParticle key={i} config={config} active={isFlowing} />
+      ))}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: HOURGLASS_WIDTH,
+    height: HOURGLASS_HEIGHT,
+  },
+  image: {
+    width: HOURGLASS_WIDTH,
+    height: HOURGLASS_HEIGHT,
+  },
+});
