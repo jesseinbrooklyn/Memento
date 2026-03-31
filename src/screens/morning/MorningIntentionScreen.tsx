@@ -30,6 +30,21 @@ const INTENTION_SUGGESTIONS = [
   "I will finish what I start today.",
   "I will forgive one thing I have been holding onto.",
   "I will remember that this day will not come again.",
+  "I will not complain about what I cannot change.",
+  "I will give my full attention to whoever is in front of me.",
+  "I will accept what comes without wishing it were different.",
+  "I will do the hard thing first.",
+  "I will say no to one thing that does not serve me.",
+  "I will eat and drink as though someone is watching my discipline.",
+  "I will not check my phone in the first hour of the day.",
+  "I will prepare for the worst and work for the best.",
+  "I will notice one thing I usually take for granted.",
+  "I will carry less weight in my mind today.",
+  "I will not seek approval for doing what is right.",
+  "I will make one difficult conversation I have been avoiding.",
+  "I will rest without guilt when the work is done.",
+  "I will leave something better than I found it.",
+  "I will not let comfort decide what I do today.",
 ];
 
 function pickRandom(arr: string[], count: number): string[] {
