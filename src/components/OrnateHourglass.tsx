@@ -17,18 +17,18 @@ interface OrnateHourglassProps {
 }
 
 const PARTICLE_COUNT = 6;
-const HOURGLASS_HEIGHT = 220;
-const HOURGLASS_WIDTH = 140;
+const HOURGLASS_HEIGHT = 320;
+const HOURGLASS_WIDTH = 240;
 
 // Each particle falls from the neck area to the bottom bulb
 // Staggered start times, slightly different horizontal drift
 const PARTICLE_CONFIGS = [
-  { delay: 0, driftX: -1.5, duration: 1800, size: 2 },
-  { delay: 300, driftX: 0.8, duration: 1600, size: 1.5 },
-  { delay: 600, driftX: -0.5, duration: 2000, size: 2.5 },
-  { delay: 900, driftX: 1.2, duration: 1700, size: 1.5 },
-  { delay: 1200, driftX: -0.8, duration: 1900, size: 2 },
-  { delay: 1500, driftX: 0.3, duration: 1500, size: 2 },
+  { delay: 0, driftX: -0.8, duration: 1800, size: 1 },
+  { delay: 300, driftX: 0.4, duration: 1600, size: 0.75 },
+  { delay: 600, driftX: -0.3, duration: 2000, size: 1.25 },
+  { delay: 900, driftX: 0.6, duration: 1700, size: 0.75 },
+  { delay: 1200, driftX: -0.4, duration: 1900, size: 1 },
+  { delay: 1500, driftX: 0.2, duration: 1500, size: 1 },
 ];
 
 interface SandParticleProps {
@@ -44,9 +44,9 @@ const SandParticle: React.FC<SandParticleProps> = ({ config, active }) => {
   useEffect(() => {
     if (!active || prefersReducedMotion) return;
 
-    // Fall distance: from neck (~48% down) to bottom bulb (~82% down)
+    // Fall distance: from just below neck (~52% down) to just above sand pile (~68% down)
     const fallStart = 0;
-    const fallEnd = HOURGLASS_HEIGHT * 0.34;
+    const fallEnd = HOURGLASS_HEIGHT * 0.12;
 
     translateY.value = withDelay(
       config.delay,
@@ -64,9 +64,9 @@ const SandParticle: React.FC<SandParticleProps> = ({ config, active }) => {
       config.delay,
       withRepeat(
         withSequence(
-          withTiming(0.7, { duration: 100 }),
-          withTiming(0.7, { duration: config.duration - 300 }),
-          withTiming(0, { duration: 200 }),
+          withTiming(0.5, { duration: 100 }),
+          withTiming(0.3, { duration: config.duration - 400 }),
+          withTiming(0, { duration: 300 }),
         ),
         -1,
         false
@@ -89,8 +89,8 @@ const SandParticle: React.FC<SandParticleProps> = ({ config, active }) => {
       style={[
         {
           position: 'absolute',
-          // Start at the neck of the hourglass
-          top: HOURGLASS_HEIGHT * 0.48,
+          // Start just below the neck of the hourglass
+          top: HOURGLASS_HEIGHT * 0.52,
           left: HOURGLASS_WIDTH / 2 - config.size / 2,
           width: config.size,
           height: config.size,
