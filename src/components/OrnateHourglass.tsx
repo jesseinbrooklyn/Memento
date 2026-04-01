@@ -17,18 +17,18 @@ interface OrnateHourglassProps {
 }
 
 const PARTICLE_COUNT = 6;
-const HOURGLASS_HEIGHT = 320;
-const HOURGLASS_WIDTH = 240;
+const HOURGLASS_HEIGHT = 400;
+const HOURGLASS_WIDTH = 300;
 
 // Each particle falls from the neck area to the bottom bulb
 // Staggered start times, slightly different horizontal drift
 const PARTICLE_CONFIGS = [
-  { delay: 0, driftX: -0.8, duration: 1800, size: 1 },
-  { delay: 300, driftX: 0.4, duration: 1600, size: 0.75 },
-  { delay: 600, driftX: -0.3, duration: 2000, size: 1.25 },
-  { delay: 900, driftX: 0.6, duration: 1700, size: 0.75 },
-  { delay: 1200, driftX: -0.4, duration: 1900, size: 1 },
-  { delay: 1500, driftX: 0.2, duration: 1500, size: 1 },
+  { delay: 0, driftX: -1, duration: 1800, size: 1.25 },
+  { delay: 300, driftX: 0.5, duration: 1600, size: 1 },
+  { delay: 600, driftX: -0.4, duration: 2000, size: 1.5 },
+  { delay: 900, driftX: 0.75, duration: 1700, size: 1 },
+  { delay: 1200, driftX: -0.5, duration: 1900, size: 1.25 },
+  { delay: 1500, driftX: 0.25, duration: 1500, size: 1.25 },
 ];
 
 interface SandParticleProps {
