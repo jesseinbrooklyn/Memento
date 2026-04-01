@@ -61,7 +61,7 @@ export default function App() {
             await scheduleBells(state.morningBellTime, state.eveningBellTime);
          }
       })
-      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => new Promise(resolve => setTimeout(resolve, 4000)))
       .then(() => setDbStatus('ready'))
       .catch(() => {
         setDbStatus('ready');
