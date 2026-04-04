@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Platform, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import {
   useFonts,
   Cinzel_400Regular,
@@ -28,6 +29,12 @@ import { colors } from './src/theme/tokens';
 
 export default function App() {
   const [dbStatus, setDbStatus] = useState<'loading' | 'ready'>('loading');
+  const [splashDone, setSplashDone] = useState(false);
+  const splashOpacity = useSharedValue(1);
+
+  const splashStyle = useAnimatedStyle(() => ({
+    opacity: splashOpacity.value,
+  }));
 
   const [fontsLoaded] = useFonts({
     'Cinzel': Cinzel_400Regular,
@@ -61,25 +68,47 @@ export default function App() {
             await scheduleBells(state.morningBellTime, state.eveningBellTime);
          }
       })
-      .then(() => new Promise(resolve => setTimeout(resolve, 8000)))
       .then(() => setDbStatus('ready'))
       .catch(() => {
         setDbStatus('ready');
       });
   }, []);
 
-  if (!fontsLoaded || dbStatus === 'loading') {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.bgPrimary, justifyContent: 'center', alignItems: 'center' }}>
-      </View>
-    );
-  }
+  const appReady = fontsLoaded && dbStatus === 'ready';
+
+  useEffect(() => {
+    if (appReady && !splashDone) {
+      splashOpacity.value = withTiming(0, { duration: 600 }, (finished) => {
+        if (finished) {
+          runOnJS(setSplashDone)(true);
+        }
+      });
+    }
+  }, [appReady]);
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={{ dark: true, colors: { primary: colors.gold, background: colors.bgPrimary, card: colors.bgSecondary, text: colors.bone, border: colors.goldDim, notification: colors.gold }, fonts: { regular: { fontFamily: 'System', fontWeight: '400' }, medium: { fontFamily: 'System', fontWeight: '500' }, bold: { fontFamily: 'System', fontWeight: '700' }, heavy: { fontFamily: 'System', fontWeight: '900' } } }}>
-        <RootNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <View style={styles.container}>
+      {appReady && (
+        <SafeAreaProvider>
+          <NavigationContainer theme={{ dark: true, colors: { primary: colors.gold, background: colors.bgPrimary, card: colors.bgSecondary, text: colors.bone, border: colors.goldDim, notification: colors.gold }, fonts: { regular: { fontFamily: 'System', fontWeight: '400' }, medium: { fontFamily: 'System', fontWeight: '500' }, bold: { fontFamily: 'System', fontWeight: '700' }, heavy: { fontFamily: 'System', fontWeight: '900' } } }}>
+            <RootNavigator />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      )}
+      {!splashDone && (
+        <Animated.View style={[styles.splash, splashStyle]} pointerEvents="none" />
+      )}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.bgPrimary,
+  },
+  splash: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.bgPrimary,
+  },
+});
