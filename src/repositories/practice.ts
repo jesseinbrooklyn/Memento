@@ -67,9 +67,13 @@ export const PracticeRepository = {
       `SELECT morning_complete, evening_complete, intention FROM practice_log WHERE date = ?`,
       [today]
     );
-    
+
     if (row) {
       usePracticeStore.getState().setTodaysProgress(!!row.morning_complete, !!row.evening_complete, row.intention);
+    } else {
+      // No row for today — day has rolled over. Reset the store so the morning practice
+      // is available again instead of leaving yesterday's completion state in place.
+      usePracticeStore.getState().setTodaysProgress(false, false, null);
     }
   },
 

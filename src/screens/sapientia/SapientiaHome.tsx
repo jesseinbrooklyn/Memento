@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, AppState, Platform } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -20,11 +20,29 @@ interface Props {
   navigation: NavigationProp;
 }
 
+function todayKey(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+}
+
 export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  // Re-derive the quote whenever the local day changes (e.g. app resumed on a new day).
+  const [dayKey, setDayKey] = useState(todayKey);
   const todaysQuote = getTodaysQuote();
   const savedQuotes = useQuotesStore(state => state.savedQuotes);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        const next = todayKey();
+        if (next !== dayKey) setDayKey(next);
+      }
+    });
+    return () => sub.remove();
+  }, [dayKey]);
 
   const headerAnim = useEntranceAnimation({ delay: 200 });
   const quoteAnim = useEntranceAnimation({ delay: 350 });
