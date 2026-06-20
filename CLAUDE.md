@@ -355,3 +355,19 @@ These features are explicitly deferred. Do not implement them, do not scaffold t
 - On This Day resurfacing
 
 If a feature isn't in the V1 Build Spec, it doesn't exist yet.
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked as GitHub issues in `jesseinbrooklyn/Memento` via the `gh` CLI. External PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical labels — `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
