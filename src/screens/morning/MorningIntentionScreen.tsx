@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView, TextInput, Text, Platform, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
-import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, borderRadius, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { MementoButton } from '../../components/MementoButton';
 import { PracticeRepository } from '../../repositories/practice';
@@ -84,7 +84,7 @@ export const MorningIntentionScreen: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
             placeholder="I will..."
-            placeholderTextColor="rgba(212,197,160,0.25)"
+            placeholderTextColor={colors.boneGhost}
             value={intention}
             onChangeText={setIntention}
             multiline
@@ -124,15 +124,15 @@ const styles = StyleSheet.create({
   },
   prompt: {
     fontFamily: fonts.display,
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: colors.gold,
     letterSpacing: letterSpacing.wide,
     marginBottom: spacing.xl,
     textAlign: 'center',
   },
   input: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 24,
+    fontFamily: fonts.body,
+    fontSize: fontSize.xxl,
     color: colors.bone,
     textAlign: 'center',
     width: '100%',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontFamily: fonts.bodyItalic,
-    fontSize: 16,
+    fontSize: fontSize.body,
     color: colors.boneDim,
     textAlign: 'center',
   },

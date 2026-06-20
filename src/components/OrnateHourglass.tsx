@@ -95,7 +95,7 @@ const SandParticle: React.FC<SandParticleProps> = ({ config, active }) => {
           width: config.size,
           height: config.size,
           borderRadius: config.size / 2,
-          backgroundColor: '#b8973e',
+          backgroundColor: colors.goldDeep,
         },
         animatedStyle,
       ]}

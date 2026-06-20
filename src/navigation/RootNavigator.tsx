@@ -6,13 +6,14 @@ import { MorningIntentionScreen } from '../screens/morning/MorningIntentionScree
 import { EveningReflectionScreen } from '../screens/evening/EveningReflectionScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import { usePreferencesStore } from '../stores/preferences';
+import { ROUTES } from './routes';
 
 export type RootStackParamList = {
-  Onboarding: undefined;
-  Tabs: undefined;
-  MorningQuote: undefined;
-  MorningIntention: undefined;
-  EveningReflection: undefined;
+  [ROUTES.Onboarding]: undefined;
+  [ROUTES.Tabs]: undefined;
+  [ROUTES.MorningQuote]: undefined;
+  [ROUTES.MorningIntention]: undefined;
+  [ROUTES.EveningReflection]: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -23,13 +24,13 @@ export const RootNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={hasSeenIntro ? 'Tabs' : 'Onboarding'}
+      initialRouteName={hasSeenIntro ? ROUTES.Tabs : ROUTES.Onboarding}
     >
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Tabs" component={TabNavigator} />
-      <Stack.Screen name="MorningQuote" component={MorningQuoteScreen} />
-      <Stack.Screen name="MorningIntention" component={MorningIntentionScreen} />
-      <Stack.Screen name="EveningReflection" component={EveningReflectionScreen} />
+      <Stack.Screen name={ROUTES.Onboarding} component={OnboardingScreen} />
+      <Stack.Screen name={ROUTES.Tabs} component={TabNavigator} />
+      <Stack.Screen name={ROUTES.MorningQuote} component={MorningQuoteScreen} />
+      <Stack.Screen name={ROUTES.MorningIntention} component={MorningIntentionScreen} />
+      <Stack.Screen name={ROUTES.EveningReflection} component={EveningReflectionScreen} />
     </Stack.Navigator>
   );
 };

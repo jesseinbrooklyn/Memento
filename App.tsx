@@ -23,13 +23,34 @@ import { QuoteRepository } from './src/repositories/quotes';
 import { PreferencesRepository } from './src/repositories/preferences';
 import { JournalRepository } from './src/repositories/journal';
 import { usePreferencesStore } from './src/stores/preferences';
+import { usePracticeStore } from './src/stores/practice';
 import { requestNotificationPermissions, scheduleBells } from './src/utils/notifications';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { colors } from './src/theme/tokens';
+import { Theme } from '@react-navigation/native';
+
+const mementoNavTheme: Theme = {
+  dark: true,
+  colors: {
+    primary: colors.gold,
+    background: colors.bgPrimary,
+    card: colors.bgSecondary,
+    text: colors.bone,
+    border: colors.goldDim,
+    notification: colors.gold,
+  },
+  fonts: {
+    regular: { fontFamily: 'System', fontWeight: '400' },
+    medium: { fontFamily: 'System', fontWeight: '500' },
+    bold: { fontFamily: 'System', fontWeight: '700' },
+    heavy: { fontFamily: 'System', fontWeight: '900' },
+  },
+};
 
 export default function App() {
   const [dbStatus, setDbStatus] = useState<'loading' | 'ready'>('loading');
   const [splashDone, setSplashDone] = useState(false);
+  const backgroundBrightness = usePreferencesStore(state => state.backgroundBrightness);
   const splashOpacity = useSharedValue(1);
 
   const splashStyle = useAnimatedStyle(() => ({
@@ -64,8 +85,16 @@ export default function App() {
       .then(async () => {
          const granted = await requestNotificationPermissions();
          if (granted) {
-            const state = usePreferencesStore.getState();
-            await scheduleBells(state.morningBellTime, state.eveningBellTime);
+            const prefs = usePreferencesStore.getState();
+            const practice = usePracticeStore.getState();
+            // Pass today's completion state so smart scheduling can skip bells
+            // for practices the user has already done today.
+            await scheduleBells(
+              prefs.morningBellTime,
+              prefs.eveningBellTime,
+              practice.morningComplete,
+              practice.eveningComplete,
+            );
          }
       })
       .then(() => setDbStatus('ready'))
@@ -90,10 +119,17 @@ export default function App() {
     <View style={styles.container}>
       {appReady && (
         <SafeAreaProvider>
-          <NavigationContainer theme={{ dark: true, colors: { primary: colors.gold, background: colors.bgPrimary, card: colors.bgSecondary, text: colors.bone, border: colors.goldDim, notification: colors.gold }, fonts: { regular: { fontFamily: 'System', fontWeight: '400' }, medium: { fontFamily: 'System', fontWeight: '500' }, bold: { fontFamily: 'System', fontWeight: '700' }, heavy: { fontFamily: 'System', fontWeight: '900' } } }}>
+          <NavigationContainer theme={mementoNavTheme}>
             <RootNavigator />
           </NavigationContainer>
         </SafeAreaProvider>
+      )}
+      {/* Brightness overlay — warm tint over entire app, controlled by user preference */}
+      {appReady && backgroundBrightness > 0 && (
+        <View
+          style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(212,197,160,${backgroundBrightness})` }]}
+          pointerEvents="none"
+        />
       )}
       {!splashDone && (
         <Animated.View style={[styles.splash, splashStyle]} pointerEvents="none" />

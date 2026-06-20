@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, borderRadius, letterSpacing, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { usePreferencesStore } from '../../stores/preferences';
 import { PreferencesRepository } from '../../repositories/preferences';
@@ -39,41 +39,46 @@ const FACTOR_OPTIONS: Record<keyof LifeFactors, { label: string; value: string }
   ],
 };
 
+interface SegmentedControlProps {
+  factor: keyof LifeFactors;
+  label: string;
+  currentValue: string;
+}
+
+// Hoisted out of LifestyleSliders so React doesn't recreate the component
+// identity on every render of the parent.
+const SegmentedControl: React.FC<SegmentedControlProps> = ({ factor, label, currentValue }) => (
+  <View style={styles.controlGroup}>
+    <Text style={styles.controlLabel}>{label.toUpperCase()}</Text>
+    <View style={styles.segmentedRow}>
+      {FACTOR_OPTIONS[factor].map(opt => {
+        const isActive = currentValue === opt.value;
+        return (
+          <TouchableOpacity
+            key={opt.value}
+            style={[styles.segmentBtn, isActive && styles.segmentBtnActive]}
+            // PreferencesRepository.updateLifeFactor writes to DB then calls setLifeFactors.
+            // No need to call setLifeFactors separately — the repo owns both.
+            onPress={() => PreferencesRepository.updateLifeFactor(factor, opt.value)}
+          >
+            <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>{opt.label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  </View>
+);
+
 export const LifestyleSliders: React.FC = () => {
   const { lifeFactors } = usePreferencesStore();
 
-  const SegmentedControl = ({ factor, label }: { factor: keyof LifeFactors, label: string }) => {
-    return (
-      <View style={styles.controlGroup}>
-        <Text style={styles.controlLabel}>{label.toUpperCase()}</Text>
-        <View style={styles.segmentedRow}>
-          {FACTOR_OPTIONS[factor].map(opt => {
-            const isActive = lifeFactors[factor] === opt.value;
-            return (
-              <TouchableOpacity
-                key={opt.value}
-                style={[styles.segmentBtn, isActive && styles.segmentBtnActive]}
-                onPress={() => {
-                  usePreferencesStore.getState().setLifeFactors({ [factor]: opt.value });
-                  PreferencesRepository.updateLifeFactor(factor, opt.value);
-                }}
-              >
-                <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>{opt.label}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-    );
-  };
-
   return (
     <>
-      <SegmentedControl factor="smoking" label="Smoking" />
-      <SegmentedControl factor="drinking" label="Drinking" />
-      <SegmentedControl factor="exercise" label="Exercise" />
-      <SegmentedControl factor="diet" label="Diet" />
-      <SegmentedControl factor="sleep" label="Sleep" />
+      <SegmentedControl factor="smoking" label="Smoking" currentValue={lifeFactors.smoking} />
+      <SegmentedControl factor="drinking" label="Drinking" currentValue={lifeFactors.drinking} />
+      <SegmentedControl factor="exercise" label="Exercise" currentValue={lifeFactors.exercise} />
+      <SegmentedControl factor="diet" label="Diet" currentValue={lifeFactors.diet} />
+      <SegmentedControl factor="sleep" label="Sleep" currentValue={lifeFactors.sleep} />
     </>
   );
 };
@@ -83,10 +88,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   controlLabel: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 14,
+    fontFamily: fonts.body,
+    fontSize: fontSize.md,
     color: colors.boneDim,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
     marginBottom: spacing.sm,
   },
   segmentedRow: {
@@ -108,9 +113,9 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontFamily: fonts.display,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.boneDim,
-    letterSpacing: 1,
+    letterSpacing: letterSpacing.tight,
   },
   segmentTextActive: {
     color: colors.bgPrimary,

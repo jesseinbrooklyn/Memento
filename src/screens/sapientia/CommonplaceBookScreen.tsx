@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SapientiaStackParamList } from '../../navigation/SapientiaNavigator';
-import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, borderRadius, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { useQuotesStore, SavedQuoteRecord } from '../../stores/quotes';
 import quotesData from '../../content/quotes.json';
@@ -111,15 +111,15 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 16,
+    fontSize: fontSize.body,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
   },
   headerAction: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.goldDim,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   listContent: {
     padding: spacing.lg,
@@ -133,17 +133,17 @@ const styles = StyleSheet.create({
     borderColor: colors.goldGlow,
   },
   quoteText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 18,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.lg,
     color: colors.boneDim,
     lineHeight: 28,
   },
   quoteAuthor: {
     fontFamily: fonts.display,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.gold,
     marginTop: spacing.md,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   noteContainer: {
     marginTop: spacing.lg,
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
     borderTopColor: colors.goldGlow,
   },
   noteText: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 16,
+    fontFamily: fonts.body,
+    fontSize: fontSize.body,
     color: colors.bone,
     lineHeight: 24,
   },
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   noteInput: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 16,
+    fontFamily: fonts.body,
+    fontSize: fontSize.body,
     color: colors.bone,
     minHeight: 80,
     textAlignVertical: 'top',
@@ -183,23 +183,23 @@ const styles = StyleSheet.create({
   },
   saveBtnText: {
     fontFamily: fonts.display,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.gold,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   emptyContainer: {
     alignItems: 'center',
     marginTop: spacing.xxxl,
   },
   emptyText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 18,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.lg,
     color: colors.boneDim,
     textAlign: 'center',
   },
   emptyCta: {
     fontFamily: fonts.display,
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.gold,
     letterSpacing: letterSpacing.wide,
     marginTop: spacing.md,

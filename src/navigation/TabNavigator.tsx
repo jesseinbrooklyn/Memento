@@ -4,18 +4,19 @@ import { AwakenScreen } from '../screens/awaken/AwakenScreen';
 import { SapientiaNavigator } from './SapientiaNavigator';
 import { TempusScreen } from '../screens/tempus/TempusScreen';
 import { ScriptumNavigator } from './ScriptumNavigator';
-import { VirtusScreen } from '../screens/virtus/VirtusScreen';
+import { VirtusNavigator } from './VirtusNavigator';
 import { colors } from '../theme/tokens';
 import { AwakenIcon, SapientiaIcon, TempusIcon, ScriptumIcon, VirtusIcon } from '../components/icons';
+import { ROUTES } from './routes';
 
 const Tab = createBottomTabNavigator();
 
 const TAB_ICONS: Record<string, React.FC<{ color: string; size?: number }>> = {
-  AWAKEN: AwakenIcon,
-  SAPIENTIA: SapientiaIcon,
-  TEMPUS: TempusIcon,
-  SCRIPTUM: ScriptumIcon,
-  VIRTUS: VirtusIcon,
+  [ROUTES.TabAwaken]: AwakenIcon,
+  [ROUTES.TabSapientia]: SapientiaIcon,
+  [ROUTES.TabTempus]: TempusIcon,
+  [ROUTES.TabScriptum]: ScriptumIcon,
+  [ROUTES.TabVirtus]: VirtusIcon,
 };
 
 export const TabNavigator = () => {
@@ -29,18 +30,18 @@ export const TabNavigator = () => {
           borderTopColor: colors.goldDim,
         },
         tabBarActiveTintColor: colors.gold,
-        tabBarInactiveTintColor: 'rgba(196,163,90,0.35)',
+        tabBarInactiveTintColor: colors.goldMuted,
         tabBarIcon: ({ color, size }) => {
           const Icon = TAB_ICONS[route.name];
           return Icon ? <Icon color={color} size={size} /> : null;
         },
       })}
     >
-      <Tab.Screen name="AWAKEN" component={AwakenScreen} />
-      <Tab.Screen name="SAPIENTIA" component={SapientiaNavigator} />
-      <Tab.Screen name="TEMPUS" component={TempusScreen} />
-      <Tab.Screen name="SCRIPTUM" component={ScriptumNavigator} />
-      <Tab.Screen name="VIRTUS" component={VirtusScreen} />
+      <Tab.Screen name={ROUTES.TabAwaken} component={AwakenScreen} />
+      <Tab.Screen name={ROUTES.TabSapientia} component={SapientiaNavigator} />
+      <Tab.Screen name={ROUTES.TabTempus} component={TempusScreen} />
+      <Tab.Screen name={ROUTES.TabScriptum} component={ScriptumNavigator} />
+      <Tab.Screen name={ROUTES.TabVirtus} component={VirtusNavigator} />
     </Tab.Navigator>
   );
 };

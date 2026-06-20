@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SapientiaStackParamList } from '../../navigation/SapientiaNavigator';
-import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, borderRadius, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import quotesData from '../../content/quotes.json';
-import { Quote } from '../../types';
+import { Quote, Theme } from '../../types';
+import { ROUTES } from '../../navigation/routes';
 
-type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, 'QuoteLibrary'>;
+type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, typeof ROUTES.QuoteLibrary>;
 
 interface Props {
   navigation: NavigationProp;
@@ -19,13 +20,13 @@ export const QuoteLibraryScreen: React.FC<Props> = ({ navigation }) => {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
 
   const filteredQuotes = selectedTheme
-    ? (quotesData as Quote[]).filter(q => q.themes.includes(selectedTheme))
+    ? (quotesData as Quote[]).filter(q => q.themes.includes(selectedTheme as Theme))
     : (quotesData as Quote[]);
 
   const renderQuoteItem = ({ item }: { item: Quote }) => (
     <TouchableOpacity
       style={styles.quoteCard}
-      onPress={() => navigation.navigate('QuoteDetail', { quote: item })}
+      onPress={() => navigation.navigate(ROUTES.QuoteDetail, { quote: item })}
     >
       <Text style={styles.quotePreview} numberOfLines={3}>"{item.text}"</Text>
       <Text style={styles.quoteAuthor}>— {item.author.toUpperCase()}</Text>
@@ -96,13 +97,13 @@ const styles = StyleSheet.create({
   },
   headerAction: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.boneDim,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 16,
+    fontSize: fontSize.body,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
   },
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   },
   themeText: {
     fontFamily: fonts.body,
-    fontSize: 16,
+    fontSize: fontSize.body,
     color: colors.boneGhost,
   },
   themeTextActive: {
@@ -147,24 +148,24 @@ const styles = StyleSheet.create({
   },
   quotePreview: {
     fontFamily: fonts.bodyItalic,
-    fontSize: 18,
+    fontSize: fontSize.lg,
     color: colors.bone,
     lineHeight: 28,
   },
   quoteAuthor: {
     fontFamily: fonts.display,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.gold,
     marginTop: spacing.md,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   emptyContainer: {
     alignItems: 'center',
     marginTop: spacing.xxxl,
   },
   emptyText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 18,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.lg,
     color: colors.boneDim,
     textAlign: 'center',
   },

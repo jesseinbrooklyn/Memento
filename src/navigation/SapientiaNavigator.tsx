@@ -5,12 +5,13 @@ import { QuoteLibraryScreen } from '../screens/sapientia/QuoteLibraryScreen';
 import { QuoteDetailScreen } from '../screens/sapientia/QuoteDetailScreen';
 import { CommonplaceBookScreen } from '../screens/sapientia/CommonplaceBookScreen';
 import { Quote } from '../types';
+import { ROUTES } from './routes';
 
 export type SapientiaStackParamList = {
-  SapientiaHome: undefined;
-  QuoteLibrary: undefined;
-  QuoteDetail: { quote: Quote };
-  CommonplaceBook: undefined;
+  [ROUTES.SapientiaHome]: undefined;
+  [ROUTES.QuoteLibrary]: undefined;
+  [ROUTES.QuoteDetail]: { quote: Quote };
+  [ROUTES.CommonplaceBook]: undefined;
 };
 
 const Stack = createNativeStackNavigator<SapientiaStackParamList>();
@@ -18,10 +19,10 @@ const Stack = createNativeStackNavigator<SapientiaStackParamList>();
 export const SapientiaNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="SapientiaHome" component={SapientiaHome} />
-      <Stack.Screen name="QuoteLibrary" component={QuoteLibraryScreen} />
-      <Stack.Screen name="QuoteDetail" component={QuoteDetailScreen} />
-      <Stack.Screen name="CommonplaceBook" component={CommonplaceBookScreen} />
+      <Stack.Screen name={ROUTES.SapientiaHome} component={SapientiaHome} />
+      <Stack.Screen name={ROUTES.QuoteLibrary} component={QuoteLibraryScreen} />
+      <Stack.Screen name={ROUTES.QuoteDetail} component={QuoteDetailScreen} />
+      <Stack.Screen name={ROUTES.CommonplaceBook} component={CommonplaceBookScreen} />
     </Stack.Navigator>
   );
 };

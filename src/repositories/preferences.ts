@@ -32,6 +32,7 @@ export const PreferencesRepository = {
     if (prefs['morningBellTime']) setPreferences({ morningBellTime: prefs['morningBellTime'] });
     if (prefs['eveningBellTime']) setPreferences({ eveningBellTime: prefs['eveningBellTime'] });
     if (prefs['use24HourTime'] !== undefined) setPreferences({ use24HourTime: prefs['use24HourTime'] === 'true' });
+    if (prefs['backgroundBrightness'] !== undefined) setPreferences({ backgroundBrightness: parseFloat(prefs['backgroundBrightness']) || 0 });
 
     const factors: Partial<LifeFactors> = {};
     if (prefs['lifestyle_smoking']) factors.smoking = prefs['lifestyle_smoking'] as LifeFactors['smoking'];
@@ -59,6 +60,17 @@ export const PreferencesRepository = {
   async updateUse24HourTime(val: boolean): Promise<void> {
     await this.savePreference('use24HourTime', String(val));
     usePreferencesStore.getState().setUse24HourTime(val);
+  },
+
+  async updateBellTimes(morning: string, evening: string): Promise<void> {
+    await this.savePreference('morningBellTime', morning);
+    await this.savePreference('eveningBellTime', evening);
+    usePreferencesStore.getState().setPreferences({ morningBellTime: morning, eveningBellTime: evening });
+  },
+
+  async updateBackgroundBrightness(val: number): Promise<void> {
+    await this.savePreference('backgroundBrightness', String(val));
+    usePreferencesStore.getState().setPreferences({ backgroundBrightness: val });
   },
 
   async markOnboardingComplete(): Promise<void> {

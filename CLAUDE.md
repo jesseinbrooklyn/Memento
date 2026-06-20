@@ -42,10 +42,10 @@ Three layers. Never mix them.
 1. **UI state** — component-local. Modal open/closed, form drafts, scroll position, animation state. Dies when the component unmounts.
 
 2. **Domain state** — Zustand stores. Shared across screens. Four stores:
-   - `useDailyContentStore` — today's quote, intention, reflection status
-   - `usePracticeStore` — practice log, calendar data
+   - `usePracticeStore` — practice log, calendar data, streak
    - `useQuotesStore` — saved quotes, commonplace book
    - `usePreferencesStore` — notification times, birthdate, lifestyle factors
+   - `useJournalStore` — journal entries (in-memory, loaded from SQLite at launch)
 
 3. **Persistence** — SQLite via repository layer. Zustand stores hydrate FROM repositories on app launch. Stores never write directly to SQLite.
 
@@ -53,12 +53,18 @@ Three layers. Never mix them.
 
 All database reads and writes go through repository functions. Stores do NOT auto-persist.
 
+Repository methods that write to SQLite also push the change into the relevant Zustand store. Screens and components should call only the repository — never the store setter directly after a write.
+
 ```typescript
-// CORRECT — explicit repository action
+// CORRECT — repository owns the write AND the store update
 async function completeMorningPractice(intention: string) {
   await PracticeRepository.markMorningComplete(today(), intention);
-  usePracticeStore.getState().setMorningComplete(intention);
+  // PracticeRepository calls usePracticeStore.getState().setMorningComplete() internally
 }
+
+// WRONG — calling store setter separately after a repo write (double update)
+await PracticeRepository.markMorningComplete(today(), intention);
+usePracticeStore.getState().setMorningComplete(intention); // repo already did this
 
 // WRONG — store middleware auto-writing
 usePracticeStore.subscribe((state) => db.write(state)); // Never do this
@@ -80,18 +86,29 @@ src/
     VanitasBackground.tsx
     OrnateHourglass.tsx
     DailyQuote.tsx
-    PracticeCalendar.tsx
+    PracticeCalendar.tsx      # 30/90-day dot grid
+    MementoButton.tsx         # Primary CTA button
+    icons/                    # All custom SVG icons
+    tempus/
+      LifestyleSliders.tsx    # Algorithm factor inputs
   screens/           # Screen components (one per tab + sub-screens)
     awaken/
     sapientia/
     tempus/
     scriptum/
     virtus/
+    settings/
+      SettingsScreen.tsx      # Birthdate, bells, lifestyle, time format
+    onboarding/
+      OnboardingScreen.tsx    # Step orchestrator
+      WelcomeStep.tsx
+      CalibrateStep.tsx
+      NotificationsStep.tsx
   stores/            # Zustand stores
-    dailyContent.ts
     practice.ts
     quotes.ts
     preferences.ts
+    journal.ts
   repositories/      # SQLite data access
     practice.ts
     journal.ts
@@ -100,18 +117,34 @@ src/
     db.ts            # SQLite connection + table creation
   content/           # Embedded JSON content
     quotes.json
-    prompts.json
   theme/             # Design system tokens
-    tokens.ts
-    fonts.ts
+    tokens.ts        # colors, spacing, fontSize, letterSpacing, borderRadius
+    fonts.ts         # Font family name constants
   utils/             # Pure utility functions
     lifeCalculator.ts
-    dailyContent.ts
+    dailyContent.ts  # getDailyIndex
+    date.ts          # todayString, parseBirthDate, formatBirthInput
+    id.ts            # generateId
+    notifications.ts # requestNotificationPermissions, scheduleBells
   types/             # TypeScript type definitions
     index.ts
   navigation/        # React Navigation config
+    routes.ts        # ROUTES constants — single source of truth for all route names
+    RootNavigator.tsx
     TabNavigator.tsx
-    stacks/
+    SapientiaNavigator.tsx
+    ScriptumNavigator.tsx
+    VirtusNavigator.tsx      # Stack: VirtusScreen → StreakHistory → Settings
+```
+
+### Routes
+
+All navigation uses the `ROUTES` constants object from `src/navigation/routes.ts`. Never use raw string literals for route names anywhere in the codebase.
+
+```typescript
+import { ROUTES } from '../../navigation/routes';
+navigation.navigate(ROUTES.QuoteDetail, { quote });
+navigation.navigate(ROUTES.Settings);
 ```
 
 ### Naming conventions
@@ -131,18 +164,34 @@ src/
 
 ```typescript
 export const colors = {
+  // Backgrounds
   bgPrimary: '#14100a',       // App background
   bgSecondary: '#1c1710',     // Cards, elevated surfaces
   bgTertiary: '#0e0b07',      // Deepest surfaces, overlays
+  bgDeep: '#0a0805',          // Modal backdrops
+
+  // Gold spectrum
   gold: '#c4a35a',            // Primary accent
-  goldDim: 'rgba(196,163,90,0.25)',   // Borders, dividers
-  goldGlow: 'rgba(196,163,90,0.06)',  // Card backgrounds
+  goldDim: 'rgba(196,163,90,0.25)',    // Borders, dividers
+  goldGlow: 'rgba(196,163,90,0.06)',   // Card backgrounds
+  goldMuted: 'rgba(196,163,90,0.35)',  // Inactive tabs, soft labels
+  goldStrong: 'rgba(196,163,90,0.45)', // Pressed button fill
+  goldDeep: 'rgba(196,163,90,0.55)',   // Hover states
+
+  // Text
   bone: '#d4c5a0',            // Primary text
-  boneDim: 'rgba(212,197,160,0.55)',  // Secondary text
+  boneDim: 'rgba(212,197,160,0.55)',   // Secondary text
   boneGhost: 'rgba(212,197,160,0.25)', // Tertiary text
+
+  // Semantic
   ember: '#8b4513',           // Warning
+  danger: 'rgba(180,60,40,0.9)',
+  dangerText: '#e07060',
   ash: '#3a3630',             // Disabled
   ink: 'rgba(0,0,0,0.85)',    // Text on gold backgrounds
+  shadow: 'rgba(0,0,0,0.6)',
+  surfaceMuted: 'rgba(212,197,160,0.04)',
+  dividerSubtle: 'rgba(196,163,90,0.06)',
 } as const;
 ```
 
@@ -354,7 +403,7 @@ These features are explicitly deferred. Do not implement them, do not scaffold t
 - Progression titles
 - On This Day resurfacing
 
-If a feature isn't in the V1 Build Spec, it doesn't exist yet.
+If you're unsure whether a feature belongs, check the `/docs/` build spec before adding it.
 
 ---
 

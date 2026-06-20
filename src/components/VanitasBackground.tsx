@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
+import { colors } from '../theme/tokens';
 import Animated, {
   useAnimatedStyle,
   withRepeat,
@@ -43,9 +44,9 @@ export const VanitasBackground: React.FC = () => {
         <Svg width={SCREEN_W} height={SCREEN_H}>
           <Defs>
             <RadialGradient id="vignette" cx="50%" cy="50%" rx="60%" ry="55%">
-              <Stop offset="0" stopColor="#0a0805" stopOpacity="0" />
-              <Stop offset="0.7" stopColor="#0a0805" stopOpacity="0.15" />
-              <Stop offset="1" stopColor="#0a0805" stopOpacity="0.7" />
+              <Stop offset="0" stopColor={colors.bgDeep} stopOpacity="0" />
+              <Stop offset="0.7" stopColor={colors.bgDeep} stopOpacity="0.15" />
+              <Stop offset="1" stopColor={colors.bgDeep} stopOpacity="0.7" />
             </RadialGradient>
           </Defs>
           <Rect x="0" y="0" width={SCREEN_W} height={SCREEN_H} fill="url(#vignette)" />
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0c0a07',
+    backgroundColor: colors.bgDeep,
     overflow: 'hidden',
   },
   painting: {

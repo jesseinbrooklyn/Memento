@@ -4,16 +4,25 @@ import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScriptumStackParamList } from '../../navigation/ScriptumNavigator';
-import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, borderRadius, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { useJournalStore, JournalEntry } from '../../stores/journal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ROUTES } from '../../navigation/routes';
 
-type NavigationProp = NativeStackNavigationProp<ScriptumStackParamList, 'ScriptumHome'>;
+type NavigationProp = NativeStackNavigationProp<ScriptumStackParamList, typeof ROUTES.ScriptumHome>;
 
 interface Props {
   navigation: NavigationProp;
 }
+
+// Single source of truth for journal mode display labels.
+const MODE_LABELS: Record<JournalEntry['mode'], string> = {
+  freeform: 'FREEFORM',
+  evening_reflection: 'EVENING REFLECTION',
+  morning: 'MORNING INTENTION',
+  prompt: 'STOIC PROMPT',
+};
 
 export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -23,19 +32,12 @@ export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
   const listAnim = useEntranceAnimation({ delay: 500 });
 
   const renderItem = ({ item }: { item: JournalEntry }) => {
-    const isEvening = item.mode === 'evening_reflection';
-    const isMorning = item.mode === 'morning';
-    const isPrompt = item.mode === 'prompt';
-    
-    let tagLabel = 'FREEFORM';
-    if (isEvening) tagLabel = 'EVENING REFLECTION';
-    if (isMorning) tagLabel = 'MORNING INTENTION';
-    if (isPrompt) tagLabel = 'STOIC PROMPT';
+    const tagLabel = MODE_LABELS[item.mode] ?? 'FREEFORM';
 
     return (
-      <TouchableOpacity 
-        style={styles.card} 
-        onPress={() => navigation.navigate('JournalEditor', { entry: item })}
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate(ROUTES.JournalEditor, { entry: item })}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.dateLabel}>{item.date}</Text>
@@ -56,13 +58,13 @@ export const ScriptumHome: React.FC<Props> = ({ navigation }) => {
       <Animated.View style={[styles.actionsRow, actionsAnim]}>
         <TouchableOpacity 
           style={styles.actionBtn}
-          onPress={() => navigation.navigate('JournalEditor', { isPromptMode: false })}
+          onPress={() => navigation.navigate(ROUTES.JournalEditor, { isPromptMode: false })}
         >
           <Text style={styles.actionBtnText}>+ FREEFORM</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={[styles.actionBtn, styles.actionBtnGold]}
-          onPress={() => navigation.navigate('JournalEditor', { isPromptMode: true })}
+          onPress={() => navigation.navigate(ROUTES.JournalEditor, { isPromptMode: true })}
         >
           <Text style={[styles.actionBtnText, styles.actionBtnTextDark]}>+ STOIC PROMPT</Text>
         </TouchableOpacity>
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
   },
@@ -124,9 +126,9 @@ const styles = StyleSheet.create({
   },
   actionBtnText: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.bone,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   actionBtnTextDark: {
     color: colors.bgPrimary,
@@ -150,25 +152,25 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     fontFamily: fonts.display,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.gold,
-    letterSpacing: 1,
+    letterSpacing: letterSpacing.tight,
   },
   tagLabel: {
     fontFamily: fonts.body,
-    fontSize: 10,
+    fontSize: fontSize.xs,
     color: colors.boneDim,
-    letterSpacing: 1,
+    letterSpacing: letterSpacing.tight,
   },
   promptKey: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 14,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.md,
     color: colors.goldDim,
     marginBottom: spacing.sm,
   },
   previewText: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 18,
+    fontFamily: fonts.body,
+    fontSize: fontSize.lg,
     color: colors.bone,
     lineHeight: 26,
     opacity: 0.9,
@@ -178,14 +180,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxxl,
   },
   emptyText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 18,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.lg,
     color: colors.boneDim,
     textAlign: 'center',
   },
   emptyCta: {
     fontFamily: fonts.display,
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.gold,
     letterSpacing: letterSpacing.wide,
     marginTop: spacing.md,

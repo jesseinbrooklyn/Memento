@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SapientiaStackParamList } from '../../navigation/SapientiaNavigator';
-import { colors, spacing, letterSpacing } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { getTodaysQuote } from '../../utils/dailyContent';
 import { DailyQuote } from '../../components/DailyQuote';
@@ -13,8 +13,9 @@ import { useQuotesStore } from '../../stores/quotes';
 import { QuoteRepository } from '../../repositories/quotes';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { ROUTES } from '../../navigation/routes';
 
-type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, 'SapientiaHome'>;
+type NavigationProp = NativeStackNavigationProp<SapientiaStackParamList, typeof ROUTES.SapientiaHome>;
 
 interface Props {
   navigation: NavigationProp;
@@ -70,7 +71,7 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Animated.View style={[styles.header, { paddingTop: insets.top }, headerAnim]}>
         <Text style={styles.headerTitle}>SAPIENTIA</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('CommonplaceBook')}>
+        <TouchableOpacity onPress={() => navigation.navigate(ROUTES.CommonplaceBook)}>
           <Text style={styles.headerBook}>LIBER</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -95,7 +96,7 @@ export const SapientiaHome: React.FC<Props> = ({ navigation }) => {
 
           <MementoButton
             label="VIEW MORE"
-            onPress={() => navigation.navigate('QuoteLibrary')}
+            onPress={() => navigation.navigate(ROUTES.QuoteLibrary)}
           />
         </Animated.View>
       </ScrollView>
@@ -119,13 +120,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
   },
   headerBook: {
     fontFamily: fonts.display,
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.gold,
     letterSpacing: letterSpacing.wide,
   },
@@ -143,9 +144,9 @@ const styles = StyleSheet.create({
   },
   tagLabel: {
     fontFamily: fonts.body,
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.goldDim,
-    letterSpacing: 1,
+    letterSpacing: letterSpacing.tight,
   },
   actions: {
     marginTop: spacing.xxl,
@@ -154,9 +155,9 @@ const styles = StyleSheet.create({
   },
   saveAction: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.boneDim,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   savedAction: {
     color: colors.gold,

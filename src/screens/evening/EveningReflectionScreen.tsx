@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, TextInput, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TextInput, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard, TextStyle } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
-import { colors, spacing, letterSpacing } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { MementoButton } from '../../components/MementoButton';
 import { PracticeRepository } from '../../repositories/practice';
 import { getTodaysGratitudePrompt } from '../../utils/dailyContent';
 import * as Haptics from 'expo-haptics';
+import { ROUTES } from '../../navigation/routes';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'EveningReflection'>;
+// Typed helper so we avoid `as any` for the web outline reset
+const webOutlineFix: TextStyle | undefined =
+  Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : undefined;
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, typeof ROUTES.EveningReflection>;
 
 interface Props {
   navigation: NavigationProp;
@@ -21,6 +26,11 @@ const PROMPTS = [
   "What didn't matter as much as you thought it would?",
 ];
 
+// Ordered response keys match the PROMPTS array plus the gratitude step.
+// Using an array avoids the chained ternary and stays in sync when prompts change.
+const RESPONSE_KEYS = ['well', 'short', 'trivial', 'gratitude'] as const;
+type ResponseKey = typeof RESPONSE_KEYS[number];
+
 export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
   const [step, setStep] = useState(0);
   const [responses, setResponses] = useState({ well: '', short: '', trivial: '', gratitude: '' });
@@ -29,7 +39,7 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
   const gratitudePrompt = getTodaysGratitudePrompt();
   
   const currentPrompt = step < 3 ? PROMPTS[step] : gratitudePrompt;
-  const currentKey = step === 0 ? 'well' : step === 1 ? 'short' : step === 2 ? 'trivial' : 'gratitude';
+  const currentKey: ResponseKey = RESPONSE_KEYS[step];
 
   const handleNext = async () => {
     if (step < 3) {
@@ -40,7 +50,7 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
       try {
         await PracticeRepository.markEveningComplete(responses);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        navigation.reset({ index: 0, routes: [{ name: 'Tabs' }] });
+        navigation.reset({ index: 0, routes: [{ name: ROUTES.Tabs }] });
       } catch (e) {
         // Silently capture local db issues
       }
@@ -55,9 +65,9 @@ export const EveningReflectionScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.step}>{(step + 1)} / 4</Text>
           <Text style={styles.prompt}>{currentPrompt}</Text>
           <TextInput
-            style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
+            style={[styles.input, webOutlineFix]}
             placeholder="Reflect..."
-            placeholderTextColor="rgba(212,197,160,0.25)"
+            placeholderTextColor={colors.boneGhost}
             value={responses[currentKey as keyof typeof responses]}
             onChangeText={(text) => setResponses({ ...responses, [currentKey]: text })}
             multiline
@@ -87,22 +97,22 @@ const styles = StyleSheet.create({
   },
   step: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.goldDim,
     letterSpacing: letterSpacing.wide,
     marginBottom: spacing.md,
   },
   prompt: {
     fontFamily: fonts.display,
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: colors.gold,
     letterSpacing: letterSpacing.wide,
     marginBottom: spacing.xl,
     textAlign: 'center',
   },
   input: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 22,
+    fontFamily: fonts.body,
+    fontSize: fontSize.xl,
     color: colors.bone,
     textAlign: 'center',
     width: '100%',

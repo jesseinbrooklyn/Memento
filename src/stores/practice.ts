@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 interface PracticeState {
   totalDays: number;
-  lastPracticeDate: string | null;
   morningComplete: boolean;
   eveningComplete: boolean;
   intention: string | null;
@@ -13,7 +12,6 @@ interface PracticeState {
 
 export const usePracticeStore = create<PracticeState>((set) => ({
   totalDays: 0,
-  lastPracticeDate: null,
   morningComplete: false,
   eveningComplete: false,
   intention: null,

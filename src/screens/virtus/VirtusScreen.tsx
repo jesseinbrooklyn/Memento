@@ -1,44 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
-import { colors, spacing, letterSpacing, borderRadius } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { usePracticeStore } from '../../stores/practice';
-import { usePreferencesStore } from '../../stores/preferences';
-import { PreferencesRepository } from '../../repositories/preferences';
-import { scheduleBells, requestNotificationPermissions } from '../../utils/notifications';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { VirtusStackParamList } from '../../navigation/VirtusNavigator';
+import { PracticeCalendar } from '../../components/PracticeCalendar';
+import { ROUTES } from '../../navigation/routes';
 
-export const VirtusScreen: React.FC = () => {
+type NavigationProp = NativeStackNavigationProp<VirtusStackParamList, typeof ROUTES.TabVirtus>;
+
+interface Props {
+  navigation: NavigationProp;
+}
+
+export const VirtusScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { totalDays, completedDates } = usePracticeStore();
-  const { morningBellTime, eveningBellTime } = usePreferencesStore();
 
   const metricsAnim = useEntranceAnimation({ delay: 200 });
-  const settingsAnim = useEntranceAnimation({ delay: 400 });
-
-  const [morning, setMorning] = useState(morningBellTime || '06:30');
-  const [evening, setEvening] = useState(eveningBellTime || '20:00');
-
-  const handleSaveSettings = async () => {
-    PreferencesRepository.savePreference('morningBellTime', morning);
-    PreferencesRepository.savePreference('eveningBellTime', evening);
-    usePreferencesStore.getState().setPreferences({ morningBellTime: morning, eveningBellTime: evening });
-    
-    const granted = await requestNotificationPermissions();
-    if (granted) {
-       await scheduleBells(morning, evening);
-    }
-  };
-
-  const dots = Array.from({ length: 30 }).map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (29 - i));
-    const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const isCompleted = completedDates.includes(dStr);
-    return isCompleted;
-  });
+  const actionsAnim = useEntranceAnimation({ delay: 400 });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,51 +31,33 @@ export const VirtusScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        
+
         <Animated.View style={[styles.metricsContainer, metricsAnim]}>
           <Text style={styles.mainMetric}>{totalDays.toLocaleString()}</Text>
           <Text style={styles.metricLabel}>DAYS OF DISCIPLINE</Text>
 
-          <View style={styles.gridContainer}>
-             <Text style={styles.gridLabel}>LAST 30 DAYS</Text>
-             <View style={styles.grid}>
-                {dots.map((isComplete, idx) => (
-                   <View key={idx} style={[styles.dot, isComplete ? styles.dotComplete : styles.dotMissed]} />
-                ))}
-             </View>
+          <View style={styles.calendarContainer}>
+            <Text style={styles.calendarLabel}>LAST 30 DAYS</Text>
+            <PracticeCalendar completedDates={completedDates} days={30} />
           </View>
         </Animated.View>
 
-        <Animated.View style={[styles.settingsContainer, settingsAnim]}>
-           <Text style={styles.sectionTitle}>ROUTINE SETTINGS</Text>
-           
-           <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>MORNING AWAKENING</Text>
-              <TextInput 
-                 style={styles.timeInput} 
-                 value={morning} 
-                 onChangeText={setMorning} 
-                 onBlur={handleSaveSettings}
-                 placeholder="06:30"
-                 placeholderTextColor={colors.boneGhost}
-                 keyboardType="numbers-and-punctuation"
-              />
-           </View>
+        <Animated.View style={[styles.actionsContainer, actionsAnim]}>
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate(ROUTES.StreakHistory)}
+          >
+            <Text style={styles.actionLabel}>FULL HISTORY</Text>
+            <Text style={styles.actionChevron}>›</Text>
+          </TouchableOpacity>
 
-           <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>EVENING REFLECTION</Text>
-              <TextInput 
-                 style={styles.timeInput} 
-                 value={evening} 
-                 onChangeText={setEvening} 
-                 onBlur={handleSaveSettings}
-                 placeholder="20:00"
-                 placeholderTextColor={colors.boneGhost}
-                 keyboardType="numbers-and-punctuation"
-              />
-           </View>
-
-           <Text style={styles.settingsFootnote}>Local notifications are scheduled at these times.</Text>
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={() => navigation.navigate(ROUTES.Settings)}
+          >
+            <Text style={styles.actionLabel}>SETTINGS</Text>
+            <Text style={styles.actionChevron}>›</Text>
+          </TouchableOpacity>
         </Animated.View>
 
       </ScrollView>
@@ -112,7 +78,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 20,
+    fontSize: fontSize.xl,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
   },
@@ -127,97 +93,49 @@ const styles = StyleSheet.create({
   },
   mainMetric: {
     fontFamily: fonts.display,
-    fontSize: 72,
+    fontSize: fontSize.titan,
     color: colors.bone,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   metricLabel: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 16,
+    fontFamily: fonts.body,
+    fontSize: fontSize.body,
     color: colors.goldDim,
-    letterSpacing: 4,
+    letterSpacing: letterSpacing.medium,
     marginTop: spacing.sm,
   },
-  gridContainer: {
+  calendarContainer: {
     marginTop: spacing.xxxl,
     alignItems: 'center',
   },
-  gridLabel: {
+  calendarLabel: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.gold,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
     marginBottom: spacing.lg,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: 200,
-    gap: 8,
-    justifyContent: 'center',
+  actionsContainer: {
+    paddingTop: spacing.lg,
   },
-  dot: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-  },
-  dotComplete: {
-    backgroundColor: colors.goldDim,
-    shadowColor: colors.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-  },
-  dotMissed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  settingsContainer: {
-    padding: spacing.xl,
-  },
-  sectionTitle: {
-    fontFamily: fonts.display,
-    fontSize: 14,
-    color: colors.gold,
-    letterSpacing: 2,
-    marginBottom: spacing.xl,
-    textAlign: 'center',
-  },
-  settingRow: {
+  actionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: colors.goldGlow,
   },
-  settingLabel: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 16,
-    color: colors.bone,
-    letterSpacing: 2,
-  },
-  timeInput: {
+  actionLabel: {
     fontFamily: fonts.display,
-    fontSize: 18,
-    color: colors.gold,
-    backgroundColor: colors.bgSecondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    borderColor: colors.goldDim,
-    textAlign: 'center',
-    width: 100,
+    fontSize: fontSize.md,
+    color: colors.bone,
+    letterSpacing: letterSpacing.medium,
   },
-  settingsFootnote: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 14,
-    color: colors.boneGhost,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-    lineHeight: 20,
-  }
+  actionChevron: {
+    fontFamily: fonts.display,
+    fontSize: fontSize.xxl,
+    color: colors.goldMuted,
+  },
 });

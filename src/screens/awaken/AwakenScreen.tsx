@@ -3,17 +3,21 @@ import { View, Text, StyleSheet, AppState, Platform } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useEntranceAnimation } from '../../hooks/useEntranceAnimation';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing, letterSpacing } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, fontSize } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { VanitasBackground } from '../../components/VanitasBackground';
 import { MementoButton } from '../../components/MementoButton';
 import { calculateRemainingDays } from '../../utils/lifeCalculator';
+import { parseBirthDate } from '../../utils/date';
 import { usePreferencesStore } from '../../stores/preferences';
 import { usePracticeStore } from '../../stores/practice';
 import { PracticeRepository } from '../../repositories/practice';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/RootNavigator';
+import { ROUTES } from '../../navigation/routes';
+
+const DEFAULT_DAYS_REMAINING = 14827;
 
 export const AwakenScreen = () => {
   const insets = useSafeAreaInsets();
@@ -28,15 +32,10 @@ export const AwakenScreen = () => {
   const footerAnim = useEntranceAnimation({ delay: 500 });
 
   const { birthDate, lifeFactors, use24HourTime } = usePreferencesStore(state => state);
-  const daysRemaining = (() => {
-    if (!birthDate || birthDate.length !== 10) return 14827;
-    const parts = birthDate.split('/');
-    if (parts.length !== 3) return 14827;
-    const [mm, dd, yyyy] = parts;
-    const parsed = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
-    if (isNaN(parsed.getTime())) return 14827;
-    return calculateRemainingDays(parsed, lifeFactors);
-  })();
+  const parsedBirth = parseBirthDate(birthDate);
+  const daysRemaining = parsedBirth !== null
+    ? calculateRemainingDays(parsedBirth, lifeFactors)
+    : DEFAULT_DAYS_REMAINING;
 
   useEffect(() => {
     const updateTime = () => {
@@ -68,7 +67,7 @@ export const AwakenScreen = () => {
         
         <Animated.View style={[styles.header, headerAnim]}>
           <Text style={styles.title}>MEMENTO MORI</Text>
-          <Text style={[styles.clockText, { marginTop: spacing.xxl }, morningComplete && { fontSize: 56 }]}>
+          <Text style={[styles.clockText, { marginTop: spacing.xxl }, morningComplete && { fontSize: fontSize.display }]}>
             {timeStr}
           </Text>
         </Animated.View>
@@ -84,13 +83,13 @@ export const AwakenScreen = () => {
           {!morningComplete ? (
             <MementoButton 
               label="I AM AWAKE" 
-              onPress={() => navigation.navigate('MorningQuote')} 
+              onPress={() => navigation.navigate(ROUTES.MorningQuote)} 
             />
           ) : (
             isEvening && !eveningComplete ? (
                <MementoButton 
                  label="REFLECT" 
-                 onPress={() => navigation.navigate('EveningReflection')} 
+                 onPress={() => navigation.navigate(ROUTES.EveningReflection)} 
                />
             ) : null
           )}
@@ -118,10 +117,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: fonts.display,
-    fontSize: 28,
+    fontSize: fontSize.hero,
     color: colors.bone,
     letterSpacing: letterSpacing.wide,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowColor: colors.shadow,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   },
@@ -131,32 +130,32 @@ const styles = StyleSheet.create({
   },
   clockText: {
     fontFamily: fonts.display,
-    fontSize: 64,
+    fontSize: fontSize.massive,
     color: colors.bone,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
     opacity: 0.95,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowColor: colors.shadow,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   },
   daysText: {
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 20,
+    fontFamily: fonts.body,
+    fontSize: fontSize.xl,
     color: colors.boneDim,
     marginTop: spacing.sm,
     opacity: 0.8,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowColor: colors.shadow,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
   intentionText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 24,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.xxl,
     color: colors.bone,
     marginTop: spacing.xl,
     textAlign: 'center',
     paddingHorizontal: spacing.xl,
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowColor: colors.shadow,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   },

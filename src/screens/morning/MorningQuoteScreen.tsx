@@ -6,8 +6,9 @@ import { colors, spacing } from '../../theme/tokens';
 import { DailyQuote } from '../../components/DailyQuote';
 import { MementoButton } from '../../components/MementoButton';
 import { getTodaysQuote } from '../../utils/dailyContent';
+import { ROUTES } from '../../navigation/routes';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'MorningQuote'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, typeof ROUTES.MorningQuote>;
 
 interface Props {
   navigation: NavigationProp;
@@ -22,7 +23,7 @@ export const MorningQuoteScreen: React.FC<Props> = ({ navigation }) => {
         <DailyQuote quote={quote} showContext={true} />
       </View>
       <View style={styles.footer}>
-        <MementoButton label="CONTINUE" onPress={() => navigation.navigate('MorningIntention')} />
+        <MementoButton label="CONTINUE" onPress={() => navigation.navigate(ROUTES.MorningIntention)} />
       </View>
     </SafeAreaView>
   );

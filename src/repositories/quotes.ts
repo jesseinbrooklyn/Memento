@@ -1,10 +1,11 @@
 import { getDb } from './db';
 import { useQuotesStore, SavedQuoteRecord } from '../stores/quotes';
+import { generateId } from '../utils/id';
 
 export const QuoteRepository = {
   async saveQuote(quoteId: string, personalNote: string | null = null): Promise<void> {
     const db = await getDb();
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const id = generateId();
     const now = new Date().toISOString();
 
     await db.runAsync(

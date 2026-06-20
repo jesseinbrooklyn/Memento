@@ -1,15 +1,12 @@
 import { getDb } from './db';
 import { useJournalStore, JournalEntry } from '../stores/journal';
-
-function todayString(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
+import { todayString } from '../utils/date';
+import { generateId } from '../utils/id';
 
 export const JournalRepository = {
   async createEntry(mode: JournalEntry['mode'], content: string, promptKey: string | null = null): Promise<void> {
     const db = await getDb();
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const id = generateId();
     const date = todayString();
     const now = new Date().toISOString();
 

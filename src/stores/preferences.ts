@@ -7,6 +7,7 @@ export interface PreferencesState {
   morningBellTime: string | null;
   eveningBellTime: string | null;
   use24HourTime: boolean;
+  backgroundBrightness: number; // 0 = dark (default), 0.06 = standard, 0.12 = bright
   lifeFactors: LifeFactors;
   setHasSeenIntro: (val: boolean) => void;
   setBirthDate: (date: string) => void;
@@ -29,6 +30,7 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
   morningBellTime: '06:30',
   eveningBellTime: '20:00',
   use24HourTime: false,
+  backgroundBrightness: 0,
   lifeFactors: defaultLifeFactors,
   setHasSeenIntro: (hasSeenIntro) => set({ hasSeenIntro }),
   setBirthDate: (birthDate) => set({ birthDate }),

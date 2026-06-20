@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Keyb
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { ScriptumStackParamList } from '../../navigation/ScriptumNavigator';
-import { colors, spacing, letterSpacing } from '../../theme/tokens';
+import { colors, spacing, letterSpacing, fontSize, borderRadius } from '../../theme/tokens';
 import { fonts } from '../../theme/fonts';
 import { JournalRepository } from '../../repositories/journal';
 import { getRandomStoicPrompt } from '../../utils/dailyContent';
@@ -107,15 +107,15 @@ const styles = StyleSheet.create({
   },
   headerAction: {
     fontFamily: fonts.display,
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.boneDim,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   headerTitle: {
     fontFamily: fonts.display,
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.bone,
-    letterSpacing: 2,
+    letterSpacing: letterSpacing.snug,
   },
   promptContainer: {
     padding: spacing.xl,
@@ -123,16 +123,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   promptText: {
-    fontFamily: 'CormorantGaramond-Italic',
-    fontSize: 20,
+    fontFamily: fonts.bodyItalic,
+    fontSize: fontSize.xl,
     color: colors.gold,
     textAlign: 'center',
     lineHeight: 28,
   },
   input: {
     flex: 1,
-    fontFamily: 'CormorantGaramond-Regular',
-    fontSize: 22,
+    fontFamily: fonts.body,
+    fontSize: fontSize.xl,
     color: colors.bone,
     padding: spacing.xl,
     textAlignVertical: 'top',
@@ -142,12 +142,12 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 0, 0, 0.2)',
+    borderTopColor: colors.danger,
   },
   deleteText: {
     fontFamily: fonts.display,
-    fontSize: 10,
-    color: '#ff4444',
-    letterSpacing: 2,
+    fontSize: fontSize.xs,
+    color: colors.dangerText,
+    letterSpacing: letterSpacing.snug,
   },
 });

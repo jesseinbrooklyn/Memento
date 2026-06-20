@@ -1,17 +1,14 @@
 import { getDb } from './db';
 import { usePracticeStore } from '../stores/practice';
 import { useJournalStore } from '../stores/journal';
-
-function todayString(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
+import { todayString } from '../utils/date';
+import { generateId } from '../utils/id';
 
 export const PracticeRepository = {
   async markMorningComplete(intention: string): Promise<void> {
     const db = await getDb();
     const today = todayString();
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const id = generateId();
     const now = new Date().toISOString();
 
     await db.runAsync(
@@ -28,8 +25,8 @@ export const PracticeRepository = {
   async markEveningComplete(responses: { well: string; short: string; trivial: string; gratitude: string; }): Promise<void> {
     const db = await getDb();
     const today = todayString();
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const journalId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const id = generateId();
+    const journalId = generateId();
     const now = new Date().toISOString();
 
     await db.runAsync(
