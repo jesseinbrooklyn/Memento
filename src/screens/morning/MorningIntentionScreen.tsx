@@ -46,6 +46,7 @@ const INTENTION_SUGGESTIONS = [
   "I will leave something better than I found it.",
   "I will not let comfort decide what I do today.",
   "I will not ruminate on what has passed.",
+  "I will see myself as how my loved ones see me.",
 ];
 
 function pickRandom(arr: string[], count: number): string[] {
